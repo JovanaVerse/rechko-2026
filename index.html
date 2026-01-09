@@ -361,6 +361,16 @@
             Aplikacija koristi online bazu podataka. Svi koji otvore ovaj fajl dele iste podatke u realnom vremenu! 🚀
             <br><br>
             <strong>📝 VAŽNO:</strong> MANJE pokušaja = bolje! Ko ima MANJE poena, taj POBEDI. 🏆
+            <br><br>
+            <div style="margin-top: 1rem; padding: 1rem; background: white; border-radius: 8px; border: 2px solid #10B981;">
+                <strong style="color: #065F46; display: block; margin-bottom: 0.5rem;">🎮 IGRAJ RECHKO:</strong>
+                <a href="https://rechko.com/" target="_blank" style="color: #2563EB; font-weight: 600; text-decoration: none; font-size: 1.1rem;">
+                    👉 rechko.com
+                </a>
+                <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #065F46;" id="nextGameTimer">
+                    ⏰ Učitavanje...
+                </div>
+            </div>
         </div>
 
         <div class="header">
@@ -961,6 +971,36 @@
         // Initialize
         loadScores();
         initMonths();
+        
+        // Timer za novu igru (svaki dan u 23:00)
+        function updateGameTimer() {
+            const now = new Date();
+            const nextGame = new Date();
+            nextGame.setHours(23, 0, 0, 0);
+            
+            // Ako je već prošlo 23h danas, postavi na sutra
+            if (now >= nextGame) {
+                nextGame.setDate(nextGame.getDate() + 1);
+            }
+            
+            const diff = nextGame - now;
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            const timerEl = document.getElementById('nextGameTimer');
+            if (timerEl) {
+                if (hours === 0 && minutes < 5) {
+                    timerEl.innerHTML = `⏰ Nova reč za <strong style="color: #EF4444;">${minutes}m ${seconds}s</strong> 🔥`;
+                } else {
+                    timerEl.innerHTML = `⏰ Nova reč za: <strong>${hours}h ${minutes}m</strong>`;
+                }
+            }
+        }
+        
+        // Ažuriraj tajmer svake sekunde
+        updateGameTimer();
+        setInterval(updateGameTimer, 1000);
         
         // NE UČITAVAJ testne podatke automatski!
         // Korisnik može ručno da unosi podatke
