@@ -259,6 +259,26 @@ window.markSolved=function(player){
 todayStatus[player]='solved';
 saveStatus();
 updateStatus();
+
+// Automatski skoči na današnji dan kada oba reše
+if(todayStatus.joka==='solved'&&todayStatus.paja==='solved'){
+const today=new Date();
+const currentDay=today.getDate();
+const currentMonth=today.getMonth();
+const hasResults=S[currentMonth]&&S[currentMonth][currentDay];
+if(!hasResults){
+// Prebaci na trenutni mesec i otvori današnji dan
+m=currentMonth;
+d=currentDay;
+months();
+ui();
+// Scroll do kalendara
+setTimeout(()=>{
+const calSection=document.querySelector('.calendar-section');
+if(calSection)calSection.scrollIntoView({behavior:'smooth',block:'start'});
+},300);
+}
+}
 }
 
 window.markWaiting=function(player){
@@ -460,12 +480,13 @@ const e=document.getElementById('timer');
 if(e)e.innerHTML=h===0&&mn<5?`⏰ Nova reč za <strong style="color:#EF4444">${mn}m ${s}s</strong> 🔥`:`⏰ Nova reč za: <strong>${h}h ${mn}m</strong>`;
 }
 
-// Reset statusa u ponoć
-function checkMidnight(){
+// Reset statusa u 23h (kada počinje nova Rechko reč)
+function checkNewWord(){
 const now=new Date();
-if(now.getHours()===0&&now.getMinutes()===0){
-if(todayStatus.date!==getTodayKey()){
-todayStatus={joka:'waiting',paja:'waiting',date:getTodayKey()};
+if(now.getHours()===23&&now.getMinutes()===0){
+const newKey=getTodayKey();
+if(todayStatus.date!==newKey){
+todayStatus={joka:'waiting',paja:'waiting',date:newKey};
 saveStatus();
 updateStatus();
 }
@@ -474,7 +495,7 @@ updateStatus();
 
 load();months();tmr();
 setInterval(tmr,1000);
-setInterval(checkMidnight,60000); // Provera svakog minuta
+setInterval(checkNewWord,60000); // Provera svakog minuta za novu reč u 23h
 </script>
 </body>
 </html>
