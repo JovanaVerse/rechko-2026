@@ -100,6 +100,7 @@ Aplikacija koristi online bazu podataka. Svi koji otvore ovaj fajl dele iste pod
 
 <div class="status-box">
 <div class="status-title">📊 Status igrača za danas</div>
+<div id="statusContent">
 <div class="players-status">
 <div class="player-card" id="jokaCard">
 <div class="player-name" style="color:#8B4556">😱 JOKA</div>
@@ -117,6 +118,7 @@ Aplikacija koristi online bazu podataka. Svi koji otvore ovaj fajl dele iste pod
 <div class="status-controls">
 <button class="status-btn" onclick="markSolved('paja')">✅ Rešio</button>
 <button class="status-btn" onclick="markWaiting('paja')">⏳ Čeka</button>
+</div>
 </div>
 </div>
 </div>
@@ -220,48 +222,113 @@ return`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.g
 function ui(){cal();tot();mon();yr()}
 
 function updateStatus(){
+const today=new Date();
+const currentDay=today.getDate();
+const currentMonth=today.getMonth();
+const hasResults=S[currentMonth]&&S[currentMonth][currentDay];
+
+const statusBox=document.querySelector('.status-box');
+const statusContent=document.getElementById('statusContent');
+const readyBanner=document.getElementById('readyBanner');
+
+// Ako ima rezultate za danas, prikaži pobednika
+if(hasResults){
+const result=S[currentMonth][currentDay];
+let winnerColor,winnerText,winnerEmoji;
+if(result.winner==='Joka'){
+winnerColor=cfg.jokaColor;
+winnerText='JOKA JE POBEDILA!';
+winnerEmoji='😱🏆';
+}else if(result.winner==='Paja'){
+winnerColor=cfg.pajaColor;
+winnerText='PAJA JE POBEDIO!';
+winnerEmoji='🤯🏆';
+}else{
+winnerColor='#6B7280';
+winnerText='NEREŠENO!';
+winnerEmoji='🤝';
+}
+
+statusBox.querySelector('.status-title').textContent='✅ Rezultati za danas uneti!';
+statusContent.innerHTML=`
+<div style="background:linear-gradient(135deg,${winnerColor},${winnerColor}dd);color:white;padding:2rem;border-radius:12px;text-align:center;animation:slideIn .5s ease-out">
+<div style="font-size:3rem;margin-bottom:1rem">${winnerEmoji}</div>
+<div style="font-size:1.8rem;font-weight:bold;margin-bottom:.5rem">${winnerText}</div>
+<div style="font-size:1.1rem;opacity:.9">
+Joka: ${result.joka===999?'❌ Nije rešila':result.joka+' pokušaj'+(result.joka>1?'a':'')} | 
+Paja: ${result.paja===999?'❌ Nije rešio':result.paja+' pokušaj'+(result.paja>1?'a':'')}
+</div>
+<div style="margin-top:1.5rem;font-size:1rem;opacity:.8">
+⏰ Čeka se nova Rechko reč sutra u 23h...
+</div>
+</div>`;
+readyBanner.style.display='none';
+return;
+}
+
+// Inače prikaži status igrača
+statusBox.querySelector('.status-title').textContent='📊 Status igrača za danas';
 const jokaCard=document.getElementById('jokaCard');
 const pajaCard=document.getElementById('pajaCard');
+
+// Ako ne postoje kartice, vrati ih
+if(!jokaCard||!pajaCard){
+statusContent.innerHTML=`
+<div class="players-status">
+<div class="player-card" id="jokaCard">
+<div class="player-name" style="color:#8B4556">😱 JOKA</div>
+<div class="player-emoji" id="jokaEmoji">⏳</div>
+<div class="player-status" id="jokaStatus">Učitavanje...</div>
+<div class="status-controls">
+<button class="status-btn" onclick="markSolved('joka')">✅ Rešila</button>
+<button class="status-btn" onclick="markWaiting('joka')">⏳ Čeka</button>
+</div>
+</div>
+<div class="player-card" id="pajaCard">
+<div class="player-name" style="color:#3C4C24">🤯 PAJA</div>
+<div class="player-emoji" id="pajaEmoji">⏳</div>
+<div class="player-status" id="pajaStatus">Učitavanje...</div>
+<div class="status-controls">
+<button class="status-btn" onclick="markSolved('paja')">✅ Rešio</button>
+<button class="status-btn" onclick="markWaiting('paja')">⏳ Čeka</button>
+</div>
+</div>
+</div>`;
+}
+
 const jokaEmoji=document.getElementById('jokaEmoji');
 const pajaEmoji=document.getElementById('pajaEmoji');
 const jokaStatus=document.getElementById('jokaStatus');
 const pajaStatus=document.getElementById('pajaStatus');
+const jokaCardEl=document.getElementById('jokaCard');
+const pajaCardEl=document.getElementById('pajaCard');
 
 if(todayStatus.joka==='solved'){
-jokaCard.className='player-card solved';
+jokaCardEl.className='player-card solved';
 jokaEmoji.textContent='✅';
 jokaStatus.innerHTML='<span style="color:#10B981">Rešila danas!</span>';
 }else{
-jokaCard.className='player-card waiting';
+jokaCardEl.className='player-card waiting';
 jokaEmoji.textContent='⏳';
 jokaStatus.innerHTML='<span style="color:#F59E0B">Još čeka...</span>';
 }
 
 if(todayStatus.paja==='solved'){
-pajaCard.className='player-card solved';
+pajaCardEl.className='player-card solved';
 pajaEmoji.textContent='✅';
 pajaStatus.innerHTML='<span style="color:#10B981">Rešio danas!</span>';
 }else{
-pajaCard.className='player-card waiting';
+pajaCardEl.className='player-card waiting';
 pajaEmoji.textContent='⏳';
 pajaStatus.innerHTML='<span style="color:#F59E0B">Još čeka...</span>';
 }
 
-const banner=document.getElementById('readyBanner');
 if(todayStatus.joka==='solved'&&todayStatus.paja==='solved'){
-const today=new Date();
-const currentDay=today.getDate();
-const currentMonth=today.getMonth();
-const hasResults=S[currentMonth]&&S[currentMonth][currentDay];
-if(!hasResults){
-banner.className='ready-banner';
-banner.style.display='block';
-banner.innerHTML='<h3>🎉 OBA IGRAČA SU REŠILA! 🎉</h3><p>Možeš da uneseš rezultate za danas! ⬇️</p>';
+readyBanner.className='ready-banner';
+readyBanner.style.display='block';
+readyBanner.innerHTML='<h3>🎉 OBA IGRAČA SU REŠILA! 🎉</h3><p>Možeš da uneseš rezultate za danas! ⬇️</p>';
 }else{
-banner.style.display='none';
-}
-}else{
-banner.style.display='none';
+readyBanner.style.display='none';
 }
 }
 
