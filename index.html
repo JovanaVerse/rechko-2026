@@ -399,7 +399,6 @@ h+=`</div><button class="delete-btn"style="color:${s?'#EF4444':tx}"onclick="del(
 h+='</div>';
 }
 e.innerHTML=h;
-d?show():hide();
 }
 
 function pick(i){d=i;cal();openModal()}
@@ -461,16 +460,6 @@ document.body.style.overflow=''; // Restore scroll
 
 function closeModalOnOverlay(e){
 if(e.target.classList.contains('modal-overlay'))closeModal();
-}
-
-function show(){
-openModal();
-}
-
-function hide(){
-const modal=document.getElementById('entryModal');
-modal.style.display='none';
-document.body.style.overflow='';
 }
 
 window.prev=function(){
