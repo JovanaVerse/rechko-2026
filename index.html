@@ -12,6 +12,21 @@ body{font-family:-apple-system,sans-serif;background:linear-gradient(135deg,#EEF
 .info-box{background:#D1FAE5;border:2px solid #10B981;border-radius:8px;padding:1rem;margin-bottom:1rem;color:#065F46;font-size:.9rem}
 .game-link-box{margin-top:1rem;padding:1rem;background:white;border-radius:8px;border:2px solid #10B981}
 .game-link-box a{color:#2563EB;font-weight:600;text-decoration:none;font-size:1.1rem}
+.status-box{background:white;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,.1);padding:1.5rem;margin-bottom:1rem}
+.status-title{font-size:1.3rem;font-weight:bold;color:#1F2937;margin-bottom:1rem;text-align:center}
+.players-status{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:640px){.players-status{grid-template-columns:1fr}}
+.player-card{padding:1.5rem;border-radius:12px;text-align:center;transition:all .3s;border:3px solid transparent}
+.player-card.solved{border-color:#10B981;background:#D1FAE5;animation:pulse 2s ease-in-out infinite}
+.player-card.waiting{border-color:#F59E0B;background:#FEF3C7}
+.player-name{font-size:1.5rem;font-weight:bold;margin-bottom:.5rem}
+.player-status{font-size:1rem;font-weight:600;margin-top:.5rem}
+.player-emoji{font-size:3rem;margin:.5rem 0}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.ready-banner{background:linear-gradient(135deg,#10B981,#059669);color:white;padding:1.5rem;border-radius:12px;text-align:center;margin-bottom:1rem;box-shadow:0 4px 6px rgba(0,0,0,.1);animation:slideIn .5s ease-out}
+@keyframes slideIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+.ready-banner h3{font-size:1.5rem;margin-bottom:.5rem}
+.ready-banner p{font-size:1.1rem}
 .header{background:white;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,.1);padding:1.5rem;margin-bottom:1.5rem}
 .header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
 .title{font-size:1.8rem;font-weight:bold;color:#1F2937}
@@ -52,6 +67,10 @@ body{font-family:-apple-system,sans-serif;background:linear-gradient(135deg,#EEF
 .btn-primary:hover{background:#1D4ED8}
 .btn-secondary{background:#D1D5DB;color:#374151}
 .btn-secondary:hover{background:#9CA3AF}
+.status-controls{margin-top:1rem;display:flex;gap:.5rem;justify-content:center}
+.status-btn{padding:.5rem 1rem;border:2px solid #D1D5DB;border-radius:8px;background:white;font-weight:600;cursor:pointer;transition:all .2s;font-size:.9rem}
+.status-btn:hover{background:#F3F4F6}
+.status-btn.active{background:#10B981;color:white;border-color:#10B981}
 </style>
 </head>
 <body>
@@ -66,6 +85,33 @@ Aplikacija koristi online bazu podataka. Svi koji otvore ovaj fajl dele iste pod
 <div style="margin-top:.5rem;font-size:.9rem;color:#065F46" id="timer">⏰ Učitavanje...</div>
 </div>
 </div>
+
+<div id="readyBanner" style="display:none"></div>
+
+<div class="status-box">
+<div class="status-title">📊 Status igrača za danas</div>
+<div class="players-status">
+<div class="player-card" id="jokaCard">
+<div class="player-name" style="color:#8B4556">😱 JOKA</div>
+<div class="player-emoji" id="jokaEmoji">⏳</div>
+<div class="player-status" id="jokaStatus">Učitavanje...</div>
+<div class="status-controls">
+<button class="status-btn" onclick="markSolved('joka')">✅ Rešila</button>
+<button class="status-btn" onclick="markWaiting('joka')">⏳ Čeka</button>
+</div>
+</div>
+<div class="player-card" id="pajaCard">
+<div class="player-name" style="color:#3C4C24">🤯 PAJA</div>
+<div class="player-emoji" id="pajaEmoji">⏳</div>
+<div class="player-status" id="pajaStatus">Učitavanje...</div>
+<div class="status-controls">
+<button class="status-btn" onclick="markSolved('paja')">✅ Rešio</button>
+<button class="status-btn" onclick="markWaiting('paja')">⏳ Čeka</button>
+</div>
+</div>
+</div>
+</div>
+
 <div class="header">
 <div class="header-top">
 <div class="title">🏆 RECHKO 2026</div>
@@ -105,16 +151,16 @@ proj:"rechko-2026-f9959",
 storage:"rechko-2026-f9959.firebasestorage.app",
 msg:"524255667916",
 appId:"1:524255667916:web:2ba7a1961ef6dacaba0469",
-jokaColor:"#8B4556", // Boja za Joku
-pajaColor:"#3C4C24", // Boja za Paju
-jokaEmoji:"😱", // Emoji za Joku
-pajaEmoji:"🤯"  // Emoji za Paju
+jokaColor:"#8B4556",
+pajaColor:"#3C4C24",
+jokaEmoji:"😱",
+pajaEmoji:"🤯"
 };
 // ==================================================
 
 const M=['Januar','Februar','Mart','April','Maj','Jun','Jul','Avgust','Septembar','Oktobar','Novembar','Decembar'];
 const D=[31,28,31,30,31,30,31,31,30,31,30,31];
-let db,use=0,m=0,d=null,S={};
+let db,use=0,m=0,d=null,S={},todayStatus={joka:'waiting',paja:'waiting'};
 
 try{
 firebase.initializeApp({apiKey:cfg.api,authDomain:cfg.domain,databaseURL:cfg.db,projectId:cfg.proj,storageBucket:cfg.storage,messagingSenderId:cfg.msg,appId:cfg.appId});
@@ -122,8 +168,27 @@ db=firebase.database();use=1;console.log('✅ Firebase OK');
 }catch(e){console.error('❌ Firebase error:',e)}
 
 function load(){
-if(use)db.ref('rechko2026').on('value',s=>{S=s.val()||{};ui()});
-else try{const x=localStorage.getItem('rechkoScores2026');if(x)S=JSON.parse(x);ui()}catch(e){}
+if(use){
+db.ref('rechko2026').on('value',s=>{S=s.val()||{};ui()});
+db.ref('todayStatus').on('value',s=>{
+const data=s.val();
+if(data&&data.date===getTodayKey()){
+todayStatus=data;
+}else{
+todayStatus={joka:'waiting',paja:'waiting',date:getTodayKey()};
+}
+updateStatus();
+});
+}else try{
+const x=localStorage.getItem('rechkoScores2026');
+if(x)S=JSON.parse(x);
+const st=localStorage.getItem('rechkoTodayStatus');
+if(st){
+const data=JSON.parse(st);
+if(data.date===getTodayKey())todayStatus=data;
+}
+ui();updateStatus();
+}catch(e){}
 }
 
 function save(){
@@ -131,7 +196,76 @@ if(use)db.ref('rechko2026').set(S);
 else try{localStorage.setItem('rechkoScores2026',JSON.stringify(S))}catch(e){}
 }
 
+function saveStatus(){
+todayStatus.date=getTodayKey();
+if(use)db.ref('todayStatus').set(todayStatus);
+else try{localStorage.setItem('rechkoTodayStatus',JSON.stringify(todayStatus))}catch(e){}
+}
+
+function getTodayKey(){
+const n=new Date();
+return`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
+}
+
 function ui(){cal();tot();mon();yr()}
+
+function updateStatus(){
+const jokaCard=document.getElementById('jokaCard');
+const pajaCard=document.getElementById('pajaCard');
+const jokaEmoji=document.getElementById('jokaEmoji');
+const pajaEmoji=document.getElementById('pajaEmoji');
+const jokaStatus=document.getElementById('jokaStatus');
+const pajaStatus=document.getElementById('pajaStatus');
+
+if(todayStatus.joka==='solved'){
+jokaCard.className='player-card solved';
+jokaEmoji.textContent='✅';
+jokaStatus.innerHTML='<span style="color:#10B981">Rešila danas!</span>';
+}else{
+jokaCard.className='player-card waiting';
+jokaEmoji.textContent='⏳';
+jokaStatus.innerHTML='<span style="color:#F59E0B">Još čeka...</span>';
+}
+
+if(todayStatus.paja==='solved'){
+pajaCard.className='player-card solved';
+pajaEmoji.textContent='✅';
+pajaStatus.innerHTML='<span style="color:#10B981">Rešio danas!</span>';
+}else{
+pajaCard.className='player-card waiting';
+pajaEmoji.textContent='⏳';
+pajaStatus.innerHTML='<span style="color:#F59E0B">Još čeka...</span>';
+}
+
+const banner=document.getElementById('readyBanner');
+if(todayStatus.joka==='solved'&&todayStatus.paja==='solved'){
+const today=new Date();
+const currentDay=today.getDate();
+const currentMonth=today.getMonth();
+const hasResults=S[currentMonth]&&S[currentMonth][currentDay];
+if(!hasResults){
+banner.className='ready-banner';
+banner.style.display='block';
+banner.innerHTML='<h3>🎉 OBA IGRAČA SU REŠILA! 🎉</h3><p>Možeš da uneseš rezultate za danas! ⬇️</p>';
+}else{
+banner.style.display='none';
+}
+}else{
+banner.style.display='none';
+}
+}
+
+window.markSolved=function(player){
+todayStatus[player]='solved';
+saveStatus();
+updateStatus();
+}
+
+window.markWaiting=function(player){
+todayStatus[player]='waiting';
+saveStatus();
+updateStatus();
+}
 
 function months(){
 document.getElementById('months').innerHTML=M.map((n,i)=>{
@@ -240,6 +374,14 @@ else if(p<j)w='Paja';
 if(!S[m])S[m]={};
 S[m][d]={joka:j,paja:p,winner:w};
 save();d=null;
+
+// Reset status za sledeći dan
+const today=new Date();
+if(today.getDate()===d&&today.getMonth()===m){
+todayStatus={joka:'waiting',paja:'waiting',date:getTodayKey()};
+saveStatus();
+}
+
 const dt=S[m]||{},c=Object.keys(dt).length===D[m];
 if(c&&m<11)setTimeout(()=>{alert(`🎉 ${M[m]} je završen! Prelazimo na ${M[m+1]}!`);m++;months();ui()},500);
 else ui();
@@ -318,7 +460,21 @@ const e=document.getElementById('timer');
 if(e)e.innerHTML=h===0&&mn<5?`⏰ Nova reč za <strong style="color:#EF4444">${mn}m ${s}s</strong> 🔥`:`⏰ Nova reč za: <strong>${h}h ${mn}m</strong>`;
 }
 
-load();months();tmr();setInterval(tmr,1000);
+// Reset statusa u ponoć
+function checkMidnight(){
+const now=new Date();
+if(now.getHours()===0&&now.getMinutes()===0){
+if(todayStatus.date!==getTodayKey()){
+todayStatus={joka:'waiting',paja:'waiting',date:getTodayKey()};
+saveStatus();
+updateStatus();
+}
+}
+}
+
+load();months();tmr();
+setInterval(tmr,1000);
+setInterval(checkMidnight,60000); // Provera svakog minuta
 </script>
 </body>
 </html>
