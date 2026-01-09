@@ -575,8 +575,8 @@
                     
                     if (hasScore) {
                         html += `<div class="day-scores" style="color: ${isSelected ? '#374151' : textColor};">`;
-                        html += `<div style="color: ${isSelected ? '#8B4556' : textColor};">J: ${dayScore.joka}</div>`;
-                        html += `<div style="color: ${isSelected ? '#3C4C24' : textColor};">P: ${dayScore.paja}</div>`;
+                        html += `<div style="color: ${isSelected ? '#8B4556' : textColor};">J: ${dayScore.joka === 999 ? '❌' : dayScore.joka}</div>`;
+                        html += `<div style="color: ${isSelected ? '#3C4C24' : textColor};">P: ${dayScore.paja === 999 ? '❌' : dayScore.paja}</div>`;
                         html += `</div>`;
                         html += `<button class="delete-btn" style="color: ${isSelected ? '#EF4444' : textColor};" onclick="deleteScore(${day}, event)">✕</button>`;
                     }
@@ -811,8 +811,13 @@
                 let jokaTotal = 0, pajaTotal = 0, jokaWins = 0, pajaWins = 0;
                 
                 Object.values(monthData).forEach(day => {
-                    jokaTotal += day.joka || 0;
-                    pajaTotal += day.paja || 0;
+                    // Za prikaz: 999 = 0, ostalo normalno
+                    const jokaScore = day.joka === 999 ? 0 : (day.joka || 0);
+                    const pajaScore = day.paja === 999 ? 0 : (day.paja || 0);
+                    
+                    jokaTotal += jokaScore;
+                    pajaTotal += pajaScore;
+                    
                     if (day.winner === 'Joka') jokaWins++;
                     if (day.winner === 'Paja') pajaWins++;
                 });
@@ -846,8 +851,12 @@
             
             let jokaTotal = 0, pajaTotal = 0;
             Object.values(monthData).forEach(day => {
-                jokaTotal += day.joka || 0;
-                pajaTotal += day.paja || 0;
+                // Za prikaz: 999 = 0, ostalo normalno
+                const jokaScore = day.joka === 999 ? 0 : (day.joka || 0);
+                const pajaScore = day.paja === 999 ? 0 : (day.paja || 0);
+                
+                jokaTotal += jokaScore;
+                pajaTotal += pajaScore;
             });
             
             let gradient, text, difference;
@@ -894,8 +903,12 @@
                     let jokaTotal = 0, pajaTotal = 0;
                     
                     Object.values(monthData).forEach(day => {
-                        jokaTotal += day.joka || 0;
-                        pajaTotal += day.paja || 0;
+                        // Za prikaz: 999 = 0, ostalo normalno
+                        const jokaScore = day.joka === 999 ? 0 : (day.joka || 0);
+                        const pajaScore = day.paja === 999 ? 0 : (day.paja || 0);
+                        
+                        jokaTotal += jokaScore;
+                        pajaTotal += pajaScore;
                     });
                     
                     // OBRNUTA LOGIKA: Manje poena = pobeda
