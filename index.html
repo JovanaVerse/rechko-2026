@@ -352,6 +352,25 @@
             display: block;
             margin-bottom: 0.5rem;
         }
+
+        .game-link-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid #10B981;
+        }
+
+        .game-link-box a {
+            color: #2563EB;
+            font-weight: 600;
+            text-decoration: none;
+            font-size: 1.1rem;
+        }
+
+        .game-link-box a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -361,10 +380,10 @@
             Aplikacija koristi online bazu podataka. Svi koji otvore ovaj fajl dele iste podatke u realnom vremenu! 🚀
             <br><br>
             <strong>📝 VAŽNO:</strong> MANJE pokušaja = bolje! Ko ima MANJE poena, taj POBEDI. 🏆
-            <br><br>
-            <div style="margin-top: 1rem; padding: 1rem; background: white; border-radius: 8px; border: 2px solid #10B981;">
+            
+            <div class="game-link-box">
                 <strong style="color: #065F46; display: block; margin-bottom: 0.5rem;">🎮 IGRAJ RECHKO:</strong>
-                <a href="https://rechko.com/" target="_blank" style="color: #2563EB; font-weight: 600; text-decoration: none; font-size: 1.1rem;">
+                <a href="https://rechko.com/" target="_blank">
                     👉 rechko.com
                 </a>
                 <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #065F46;" id="nextGameTimer">
@@ -412,7 +431,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <script>
-        // FIREBASE CONFIG - TVOJI NOVI PODACI!
+        // FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyATrCpqicc3HHCOpc6Pv-edqWlgpSiM-XU",
             authDomain: "rechko-2026-f9959.firebaseapp.com",
@@ -450,6 +469,32 @@
         let currentMonth = 0;
         let selectedDay = null;
         let scores = {};
+
+        // Timer za novu igru (svaki dan u 23:00)
+        function updateGameTimer() {
+            const now = new Date();
+            const nextGame = new Date();
+            nextGame.setHours(23, 0, 0, 0);
+            
+            // Ako je već prošlo 23h danas, postavi na sutra
+            if (now >= nextGame) {
+                nextGame.setDate(nextGame.getDate() + 1);
+            }
+            
+            const diff = nextGame - now;
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            const timerEl = document.getElementById('nextGameTimer');
+            if (timerEl) {
+                if (hours === 0 && minutes < 5) {
+                    timerEl.innerHTML = `⏰ Nova reč za <strong style="color: #EF4444;">${minutes}m ${seconds}s</strong> 🔥`;
+                } else {
+                    timerEl.innerHTML = `⏰ Nova reč za: <strong>${hours}h ${minutes}m</strong>`;
+                }
+            }
+        }
 
         // Load scores
         function loadScores() {
@@ -505,24 +550,26 @@
                 let borderStyle = '';
                 
                 if (isMonthComplete) {
-                    // Izračunaj pobednika meseca
                     let jokaTotal = 0, pajaTotal = 0;
+                    
                     Object.values(monthData).forEach(day => {
-                        jokaTotal += day.joka || 0;
-                        pajaTotal += day.paja || 0;
+                        const jokaScore = day.joka === 999 ? 0 : (day.joka || 0);
+                        const pajaScore = day.paja === 999 ? 0 : (day.paja || 0);
+                        
+                        jokaTotal += jokaScore;
+                        pajaTotal += pajaScore;
                     });
                     
-                    // Oboj u boju pobednika (OBRNUTA LOGIKA: manje = pobeda)
                     if (jokaTotal < pajaTotal) {
-                        bgColor = '#8B4556'; // Joka boja
+                        bgColor = '#8B4556';
                         textColor = 'white';
                         borderStyle = '2px solid #6B3444';
                     } else if (pajaTotal < jokaTotal) {
-                        bgColor = '#3C4C24'; // Paja boja
+                        bgColor = '#3C4C24';
                         textColor = 'white';
                         borderStyle = '2px solid #2C3C18';
                     } else {
-                        bgColor = '#6B7280'; // Nerešeno
+                        bgColor = '#6B7280';
                         textColor = 'white';
                         borderStyle = '2px solid #4B5563';
                     }
@@ -567,7 +614,6 @@
                     let textColor = '#374151';
                     
                     if (hasScore && !isSelected) {
-                        // OBRNUTA LOGIKA: Manje poena = pobeda
                         if (dayScore.winner === 'Joka') {
                             bgColor = 'background-color: #8B4556;';
                             textColor = 'white';
@@ -689,7 +735,6 @@
             const joka = parseInt(jokaInput.value) || 0;
             const paja = parseInt(pajaInput.value) || 0;
             
-            // Ako neko nije rešio (999), automatski gubi
             if (joka === 999 && paja === 999) {
                 winnerPreview.textContent = '🤝 Nerešeno (niko nije rešio)';
                 winnerPreview.style.background = '#F9FAFB';
@@ -703,7 +748,6 @@
                 winnerPreview.style.background = '#FEE2E2';
                 winnerPreview.style.color = '#8B4556';
             } else if (joka < paja && joka > 0) {
-                // OBRNUTA LOGIKA: Manje pokušaja = pobeda
                 winnerPreview.textContent = '😱 Joka (manje pokušaja!)';
                 winnerPreview.style.background = '#FEE2E2';
                 winnerPreview.style.color = '#8B4556';
@@ -731,279 +775,3 @@
             
             const joka = parseInt(jokaInput.value) || 0;
             const paja = parseInt(pajaInput.value) || 0;
-            
-            // Validacija - mora da se izabere nešto
-            if (joka === 0 || paja === 0) {
-                alert('⚠️ Molim te izaberi broj pokušaja za oba igrača!');
-                return;
-            }
-            
-            // OBRNUTA LOGIKA: Manje pokušaja = pobeda
-            // 999 = "Nisam rešio/la" - automatski gubi
-            let winner = 'Nerešeno';
-            if (joka === 999 && paja === 999) {
-                winner = 'Nerešeno';
-            } else if (joka === 999) {
-                winner = 'Paja'; // Joka nije rešila, Paja pobedio
-            } else if (paja === 999) {
-                winner = 'Joka'; // Paja nije rešio, Joka pobedila
-            } else if (joka < paja) {
-                winner = 'Joka';
-            } else if (paja < joka) {
-                winner = 'Paja';
-            }
-            
-            if (!scores[currentMonth]) {
-                scores[currentMonth] = {};
-            }
-            
-            scores[currentMonth][selectedDay] = { joka, paja, winner };
-            saveScores();
-            
-            selectedDay = null;
-            
-            // Proveri da li je mesec završen
-            const monthData = scores[currentMonth] || {};
-            const daysPlayed = Object.keys(monthData).length;
-            const isMonthComplete = daysPlayed === daysInMonth[currentMonth];
-            
-            if (isMonthComplete && currentMonth < 11) {
-                // Mesec je završen, pređi na sledeći
-                setTimeout(() => {
-                    alert(`🎉 ${months[currentMonth]} je završen! Prelazimo na ${months[currentMonth + 1]}!`);
-                    currentMonth = currentMonth + 1;
-                    initMonths();
-                    updateUI();
-                }, 500);
-            } else {
-                // UVEK ažuriraj UI odmah
-                updateUI();
-            }
-        }
-
-        // Delete score
-        window.deleteScore = function(day, event) {
-            event.stopPropagation();
-            
-            if (scores[currentMonth]) {
-                delete scores[currentMonth][day];
-                if (Object.keys(scores[currentMonth]).length === 0) {
-                    delete scores[currentMonth];
-                }
-            }
-            saveScores();
-            
-            // UVEK ažuriraj UI odmah, bez obzira na Firebase
-            updateUI();
-        }
-
-        // Cancel form
-        window.cancelForm = function() {
-            selectedDay = null;
-            updateCalendar();
-        }
-
-        // Reset all data
-        window.resetAllData = function() {
-            if (confirm('⚠️ Da li si sigurna da želiš da obrišeš SVE podatke za celu godinu?\n\nOvo ne može da se vrati!')) {
-                scores = {};
-                saveScores();
-                console.log('🗑️ Svi podaci obrisani!');
-                alert('✅ Svi podaci su obrisani!');
-            }
-        }
-
-        // Update totals
-        function updateTotals() {
-            try {
-                const monthData = scores[currentMonth] || {};
-                
-                let jokaTotal = 0, pajaTotal = 0, jokaWins = 0, pajaWins = 0;
-                
-                Object.values(monthData).forEach(day => {
-                    // Za prikaz: 999 = 0, ostalo normalno
-                    const jokaScore = day.joka === 999 ? 0 : (day.joka || 0);
-                    const pajaScore = day.paja === 999 ? 0 : (day.paja || 0);
-                    
-                    jokaTotal += jokaScore;
-                    pajaTotal += pajaScore;
-                    
-                    if (day.winner === 'Joka') jokaWins++;
-                    if (day.winner === 'Paja') pajaWins++;
-                });
-                
-                const jokaTotalEl = document.getElementById('jokaTotal');
-                const pajaTotalEl = document.getElementById('pajaTotal');
-                const jokaWinsEl = document.getElementById('jokaWins');
-                const pajaWinsEl = document.getElementById('pajaWins');
-                
-                if (jokaTotalEl) jokaTotalEl.textContent = jokaTotal;
-                if (pajaTotalEl) pajaTotalEl.textContent = pajaTotal;
-                if (jokaWinsEl) jokaWinsEl.textContent = jokaWins;
-                if (pajaWinsEl) pajaWinsEl.textContent = pajaWins;
-            } catch (error) {
-                console.error('Totals update error:', error);
-            }
-        }
-
-        // Update winner banner - OBRNUTA LOGIKA
-        function updateWinnerBanner() {
-            const monthData = scores[currentMonth] || {};
-            const daysPlayed = Object.keys(monthData).length;
-            const isMonthComplete = daysPlayed === daysInMonth[currentMonth];
-            
-            const bannerEl = document.getElementById('winnerBanner');
-            
-            if (!isMonthComplete) {
-                bannerEl.style.display = 'none';
-                return;
-            }
-            
-            let jokaTotal = 0, pajaTotal = 0;
-            Object.values(monthData).forEach(day => {
-                // Za prikaz: 999 = 0, ostalo normalno
-                const jokaScore = day.joka === 999 ? 0 : (day.joka || 0);
-                const pajaScore = day.paja === 999 ? 0 : (day.paja || 0);
-                
-                jokaTotal += jokaScore;
-                pajaTotal += pajaScore;
-            });
-            
-            let gradient, text, difference;
-            
-            // OBRNUTA LOGIKA: Manje poena = pobeda
-            if (jokaTotal < pajaTotal) {
-                gradient = 'linear-gradient(to right, #8B4556, #6B3444)';
-                text = '🏆 POBEDNIK MESECA: JOKA 🏆';
-                difference = `Manje pokušaja: ${pajaTotal - jokaTotal} razlika`;
-            } else if (pajaTotal < jokaTotal) {
-                gradient = 'linear-gradient(to right, #3C4C24, #2C3C18)';
-                text = '🏆 POBEDNIK MESECA: PAJA 🏆';
-                difference = `Manje pokušaja: ${jokaTotal - pajaTotal} razlika`;
-            } else {
-                gradient = 'linear-gradient(to right, #6B7280, #4B5563)';
-                text = '🤝 MESEC JE NEREŠEN 🤝';
-                difference = `Oba igrača: ${jokaTotal} pokušaja`;
-            }
-            
-            bannerEl.className = 'winner-banner';
-            bannerEl.style.background = gradient;
-            bannerEl.style.display = 'block';
-            bannerEl.innerHTML = `
-                <h3>${text}</h3>
-                <p style="font-size: 1.1rem;">${difference}</p>
-            `;
-        }
-
-        // Update yearly winner - OBRNUTA LOGIKA
-        function updateYearlyWinner() {
-            const yearlyEl = document.getElementById('yearlyWinner');
-            
-            let jokaMonthWins = 0;
-            let pajaMonthWins = 0;
-            let completedMonths = 0;
-            
-            for (let month = 0; month < 12; month++) {
-                const monthData = scores[month] || {};
-                const daysPlayed = Object.keys(monthData).length;
-                const isMonthComplete = daysPlayed === daysInMonth[month];
-                
-                if (isMonthComplete) {
-                    completedMonths++;
-                    let jokaTotal = 0, pajaTotal = 0;
-                    
-                    Object.values(monthData).forEach(day => {
-                        // Za prikaz: 999 = 0, ostalo normalno
-                        const jokaScore = day.joka === 999 ? 0 : (day.joka || 0);
-                        const pajaScore = day.paja === 999 ? 0 : (day.paja || 0);
-                        
-                        jokaTotal += jokaScore;
-                        pajaTotal += pajaScore;
-                    });
-                    
-                    // OBRNUTA LOGIKA: Manje poena = pobeda
-                    if (jokaTotal < pajaTotal) jokaMonthWins++;
-                    else if (pajaTotal < jokaTotal) pajaMonthWins++;
-                }
-            }
-            
-            if (completedMonths === 0) {
-                yearlyEl.style.display = 'none';
-                return;
-            }
-            
-            let gradient, text, subtext;
-            
-            if (jokaMonthWins > pajaMonthWins) {
-                gradient = 'linear-gradient(to right, #8B4556, #6B3444)';
-                text = '👑 JOKA VODI U GODINI 👑';
-                subtext = `${jokaMonthWins} meseci pobeda (Paja: ${pajaMonthWins})`;
-            } else if (pajaMonthWins > jokaMonthWins) {
-                gradient = 'linear-gradient(to right, #3C4C24, #2C3C18)';
-                text = '👑 PAJA VODI U GODINI 👑';
-                subtext = `${pajaMonthWins} meseci pobeda (Joka: ${jokaMonthWins})`;
-            } else {
-                gradient = 'linear-gradient(to right, #6B7280, #4B5563)';
-                text = '⚖️ GODINA JE IZJEDNAČENA ⚖️';
-                subtext = `Oba po ${jokaMonthWins} meseci pobeda`;
-            }
-            
-            if (completedMonths === 12) {
-                if (jokaMonthWins > pajaMonthWins) {
-                    text = '🎊 POBEDNIK GODINE 2026: JOKA 🎊';
-                } else if (pajaMonthWins > jokaMonthWins) {
-                    text = '🎊 POBEDNIK GODINE 2026: PAJA 🎊';
-                } else {
-                    text = '🎊 GODINA 2026 JE NEREŠENA 🎊';
-                }
-            }
-            
-            yearlyEl.className = 'winner-banner';
-            yearlyEl.style.background = gradient;
-            yearlyEl.style.display = 'block';
-            yearlyEl.innerHTML = `
-                <h3>${text}</h3>
-                <p style="font-size: 1.1rem;">${subtext}</p>
-                <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.9;">Završeno meseci: ${completedMonths}/12</p>
-            `;
-        }
-
-        // Initialize
-        loadScores();
-        initMonths();
-        
-        // Timer za novu igru (svaki dan u 23:00)
-        function updateGameTimer() {
-            const now = new Date();
-            const nextGame = new Date();
-            nextGame.setHours(23, 0, 0, 0);
-            
-            // Ako je već prošlo 23h danas, postavi na sutra
-            if (now >= nextGame) {
-                nextGame.setDate(nextGame.getDate() + 1);
-            }
-            
-            const diff = nextGame - now;
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-            
-            const timerEl = document.getElementById('nextGameTimer');
-            if (timerEl) {
-                if (hours === 0 && minutes < 5) {
-                    timerEl.innerHTML = `⏰ Nova reč za <strong style="color: #EF4444;">${minutes}m ${seconds}s</strong> 🔥`;
-                } else {
-                    timerEl.innerHTML = `⏰ Nova reč za: <strong>${hours}h ${minutes}m</strong>`;
-                }
-            }
-        }
-        
-        // Ažuriraj tajmer svake sekunde
-        updateGameTimer();
-        setInterval(updateGameTimer, 1000);
-        
-        // NE UČITAVAJ testne podatke automatski!
-        // Korisnik može ručno da unosi podatke
-    </script>
-</body>
-</html>
