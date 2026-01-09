@@ -1,777 +1,324 @@
 <!DOCTYPE html>
 <html lang="sr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RECHKO 2026</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #EEF2FF 0%, #C7D2FE 100%);
-            min-height: 100vh;
-            padding: 0.75rem;
-        }
-
-        @media (max-width: 640px) {
-            body {
-                padding: 0.5rem;
-            }
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .header {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .title {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #1F2937;
-        }
-
-        .months {
-            display: flex;
-            gap: 0.5rem;
-            overflow-x: auto;
-            padding-bottom: 0.5rem;
-        }
-
-        .month-btn {
-            padding: 0.75rem 1rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.3s;
-            font-size: 0.9rem;
-        }
-
-        .month-btn.active {
-            background: #2563EB;
-            color: white;
-            box-shadow: 0 2px 4px rgba(37,99,235,0.3);
-        }
-
-        .month-btn:not(.active) {
-            background: #F3F4F6;
-            color: #6B7280;
-        }
-
-        .scores-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .score-card {
-            border-radius: 12px;
-            padding: 1.5rem;
-            color: white;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .score-card h3 {
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .score-card .points {
-            font-size: 2rem;
-            font-weight: bold;
-        }
-
-        .score-card .wins {
-            font-size: 1.1rem;
-            margin-top: 0.5rem;
-        }
-
-        .winner-banner {
-            border-radius: 12px;
-            padding: 1.5rem;
-            color: white;
-            text-align: center;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        .winner-banner h3 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .calendar-section {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            padding: 1.5rem;
-        }
-
-        @media (max-width: 640px) {
-            .calendar-section {
-                padding: 0.75rem;
-            }
-        }
-
-        .calendar-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #1F2937;
-            margin-bottom: 1rem;
-        }
-
-        @media (max-width: 640px) {
-            .calendar-title {
-                font-size: 1.1rem;
-                margin-bottom: 0.75rem;
-            }
-        }
-
-        .calendar {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 0.4rem;
-            margin-bottom: 1.5rem;
-        }
-
-        @media (max-width: 640px) {
-            .calendar {
-                gap: 0.2rem;
-            }
-        }
-
-        .day-cell {
-            aspect-ratio: 1;
-            border: 2px solid #E5E7EB;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 0.3rem;
-            min-height: 65px;
-        }
-
-        @media (max-width: 640px) {
-            .day-cell {
-                min-height: 48px;
-                border-radius: 4px;
-                border-width: 1px;
-                padding: 0.15rem;
-            }
-        }
-
-        @media (max-width: 380px) {
-            .day-cell {
-                min-height: 42px;
-            }
-        }
-
-        .day-cell:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-            transform: scale(1.05);
-        }
-
-        .day-cell.selected {
-            border-color: #2563EB;
-            background: #EFF6FF;
-            transform: scale(1.05);
-        }
-
-        .day-number {
-            font-weight: bold;
-            font-size: 1rem;
-            text-align: center;
-            line-height: 1.2;
-        }
-
-        @media (max-width: 640px) {
-            .day-number {
-                font-size: 0.8rem;
-            }
-        }
-
-        @media (max-width: 380px) {
-            .day-number {
-                font-size: 0.75rem;
-            }
-        }
-
-        .day-scores {
-            font-size: 0.65rem;
-            text-align: center;
-            margin-top: 0.15rem;
-            line-height: 1.1;
-        }
-
-        @media (max-width: 640px) {
-            .day-scores {
-                font-size: 0.6rem;
-            }
-        }
-
-        @media (max-width: 380px) {
-            .day-scores {
-                font-size: 0.55rem;
-            }
-        }
-
-        .delete-btn {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 2px;
-            font-size: 0.7rem;
-        }
-
-        .form-section {
-            border-top: 2px solid #E5E7EB;
-            padding-top: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .form-title {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: #1F2937;
-            margin-bottom: 1rem;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 0.5rem;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #D1D5DB;
-            border-radius: 8px;
-            font-size: 1rem;
-            text-align: center;
-        }
-
-        .form-group input:focus {
-            outline: none;
-        }
-
-        .winner-display {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid #D1D5DB;
-            border-radius: 8px;
-            background: #F9FAFB;
-            font-weight: 600;
-            font-size: 1.1rem;
-            text-align: center;
-        }
-
-        .form-buttons {
-            display: flex;
-            gap: 0.75rem;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 0.875rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-primary {
-            background: #2563EB;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #1D4ED8;
-        }
-
-        .btn-secondary {
-            background: #D1D5DB;
-            color: #374151;
-        }
-
-        .btn-secondary:hover {
-            background: #9CA3AF;
-        }
-
-        .info-box {
-            background: #D1FAE5;
-            border: 2px solid #10B981;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            color: #065F46;
-            font-size: 0.9rem;
-        }
-
-        .info-box strong {
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-
-        .game-link-box {
-            margin-top: 1rem;
-            padding: 1rem;
-            background: white;
-            border-radius: 8px;
-            border: 2px solid #10B981;
-        }
-
-        .game-link-box a {
-            color: #2563EB;
-            font-weight: 600;
-            text-decoration: none;
-            font-size: 1.1rem;
-        }
-
-        .game-link-box a:hover {
-            text-decoration: underline;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RECHKO 2026</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,sans-serif;background:linear-gradient(135deg,#EEF2FF,#C7D2FE);min-height:100vh;padding:.75rem}
+@media(max-width:640px){body{padding:.5rem}}
+.container{max-width:1200px;margin:0 auto}
+.info-box{background:#D1FAE5;border:2px solid #10B981;border-radius:8px;padding:1rem;margin-bottom:1rem;color:#065F46;font-size:.9rem}
+.game-link-box{margin-top:1rem;padding:1rem;background:white;border-radius:8px;border:2px solid #10B981}
+.game-link-box a{color:#2563EB;font-weight:600;text-decoration:none;font-size:1.1rem}
+.header{background:white;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,.1);padding:1.5rem;margin-bottom:1.5rem}
+.header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.title{font-size:1.8rem;font-weight:bold;color:#1F2937}
+.months{display:flex;gap:.5rem;overflow-x:auto;padding-bottom:.5rem}
+.month-btn{padding:.75rem 1rem;border:none;border-radius:8px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .3s;font-size:.9rem}
+.month-btn.active{background:#2563EB;color:white;box-shadow:0 2px 4px rgba(37,99,235,.3)}
+.month-btn:not(.active){background:#F3F4F6;color:#6B7280}
+.scores-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;margin-bottom:1.5rem}
+.score-card{border-radius:12px;padding:1.5rem;color:white;box-shadow:0 4px 6px rgba(0,0,0,.1)}
+.score-card h3{font-size:1.25rem;margin-bottom:.5rem}
+.score-card .points{font-size:2rem;font-weight:bold}
+.score-card .wins{font-size:1.1rem;margin-top:.5rem}
+.winner-banner{border-radius:12px;padding:1.5rem;color:white;text-align:center;margin-bottom:1.5rem;box-shadow:0 4px 6px rgba(0,0,0,.1)}
+.winner-banner h3{font-size:1.5rem;margin-bottom:.5rem}
+.calendar-section{background:white;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,.1);padding:1.5rem}
+@media(max-width:640px){.calendar-section{padding:.75rem}}
+.calendar-title{font-size:1.5rem;font-weight:bold;color:#1F2937;margin-bottom:1rem}
+@media(max-width:640px){.calendar-title{font-size:1.1rem;margin-bottom:.75rem}}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:.4rem;margin-bottom:1.5rem}
+@media(max-width:640px){.calendar{gap:.2rem}}
+.day-cell{aspect-ratio:1;border:2px solid #E5E7EB;border-radius:8px;cursor:pointer;transition:all .2s;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.3rem;min-height:65px}
+@media(max-width:640px){.day-cell{min-height:48px;border-radius:4px;border-width:1px;padding:.15rem}}
+.day-cell:hover{box-shadow:0 2px 8px rgba(0,0,0,.15);transform:scale(1.05)}
+.day-cell.selected{border-color:#2563EB;background:#EFF6FF;transform:scale(1.05)}
+.day-number{font-weight:bold;font-size:1rem;text-align:center}
+@media(max-width:640px){.day-number{font-size:.8rem}}
+.day-scores{font-size:.65rem;text-align:center;margin-top:.15rem}
+@media(max-width:640px){.day-scores{font-size:.6rem}}
+.delete-btn{position:absolute;top:2px;right:2px;background:none;border:none;cursor:pointer;padding:2px;font-size:.7rem}
+.form-section{border-top:2px solid #E5E7EB;padding-top:1.5rem;margin-top:1.5rem}
+.form-title{font-size:1.25rem;font-weight:bold;color:#1F2937;margin-bottom:1rem}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1rem}
+.form-group label{display:block;font-size:.9rem;font-weight:600;color:#374151;margin-bottom:.5rem}
+.winner-display{width:100%;padding:1rem;border:2px solid #D1D5DB;border-radius:8px;background:#F9FAFB;font-weight:600;font-size:1.1rem;text-align:center}
+.form-buttons{display:flex;gap:.75rem}
+.btn{flex:1;padding:.875rem;border:none;border-radius:8px;font-weight:600;font-size:1rem;cursor:pointer;transition:all .2s}
+.btn-primary{background:#2563EB;color:white}
+.btn-primary:hover{background:#1D4ED8}
+.btn-secondary{background:#D1D5DB;color:#374151}
+.btn-secondary:hover{background:#9CA3AF}
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="info-box">
-            <strong>✅ Firebase POVEZAN!</strong>
-            Aplikacija koristi online bazu podataka. Svi koji otvore ovaj fajl dele iste podatke u realnom vremenu! 🚀
-            <br><br>
-            <strong>📝 VAŽNO:</strong> MANJE pokušaja = bolje! Ko ima MANJE poena, taj POBEDI. 🏆
-            
-            <div class="game-link-box">
-                <strong style="color: #065F46; display: block; margin-bottom: 0.5rem;">🎮 IGRAJ RECHKO:</strong>
-                <a href="https://rechko.com/" target="_blank">
-                    👉 rechko.com
-                </a>
-                <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #065F46;" id="nextGameTimer">
-                    ⏰ Učitavanje...
-                </div>
-            </div>
-        </div>
+<div class="container">
+<div class="info-box">
+<strong style="display:block;margin-bottom:.5rem">✅ Firebase POVEZAN!</strong>
+Aplikacija koristi online bazu podataka. Svi koji otvore ovaj fajl dele iste podatke u realnom vremenu! 🚀<br><br>
+<strong style="display:block;margin-bottom:.5rem">📝 VAŽNO:</strong>MANJE pokušaja = bolje! Ko ima MANJE poena, taj POBEDI. 🏆
+<div class="game-link-box">
+<strong style="color:#065F46;display:block;margin-bottom:.5rem">🎮 IGRAJ RECHKO:</strong>
+<a href="https://rechko.com/" target="_blank">👉 rechko.com</a>
+<div style="margin-top:.5rem;font-size:.9rem;color:#065F46" id="timer">⏰ Učitavanje...</div>
+</div>
+</div>
+<div class="header">
+<div class="header-top">
+<div class="title">🏆 RECHKO 2026</div>
+<button onclick="reset()" style="padding:.5rem 1rem;background:#EF4444;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:.9rem">🗑️ Reset Sve</button>
+</div>
+<div class="months" id="months"></div>
+</div>
+<div id="yearly"></div>
+<div class="scores-grid">
+<div class="score-card" style="background-color:#8B4556">
+<h3>😱 JOKA</h3>
+<div class="points"><span id="jt">0</span> poena</div>
+<div class="wins"><span id="jw">0</span> pobeda</div>
+</div>
+<div class="score-card" style="background-color:#3C4C24">
+<h3>🤯 PAJA</h3>
+<div class="points"><span id="pt">0</span> poena</div>
+<div class="wins"><span id="pw">0</span> pobeda</div>
+</div>
+</div>
+<div id="monthly"></div>
+<div class="calendar-section">
+<div class="calendar-title" id="title">Januar - Dnevni Rezultati</div>
+<div class="calendar" id="cal"></div>
+<div id="form" style="display:none"></div>
+</div>
+</div>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
+// ========== KONFIGURACIJA - MENJAJ OVDE ==========
+const cfg={
+api:"AIzaSyATrCpqicc3HHCOpc6Pv-edqWlgpSiM-XU",
+domain:"rechko-2026-f9959.firebaseapp.com",
+db:"https://rechko-2026-f9959-default-rtdb.europe-west1.firebasedatabase.app",
+proj:"rechko-2026-f9959",
+storage:"rechko-2026-f9959.firebasestorage.app",
+msg:"524255667916",
+appId:"1:524255667916:web:2ba7a1961ef6dacaba0469",
+jokaColor:"#8B4556", // Boja za Joku
+pajaColor:"#3C4C24", // Boja za Paju
+jokaEmoji:"😱", // Emoji za Joku
+pajaEmoji:"🤯"  // Emoji za Paju
+};
+// ==================================================
 
-        <div class="header">
-            <div class="header-top">
-                <div class="title">🏆 RECHKO 2026</div>
-                <button onclick="resetAllData()" style="padding: 0.5rem 1rem; background: #EF4444; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">
-                    🗑️ Reset Sve
-                </button>
-            </div>
-            <div class="months" id="months"></div>
-        </div>
+const M=['Januar','Februar','Mart','April','Maj','Jun','Jul','Avgust','Septembar','Oktobar','Novembar','Decembar'];
+const D=[31,28,31,30,31,30,31,31,30,31,30,31];
+let db,use=0,m=0,d=null,S={};
 
-        <div id="yearlyWinner" style="margin-bottom: 1.5rem;"></div>
+try{
+firebase.initializeApp({apiKey:cfg.api,authDomain:cfg.domain,databaseURL:cfg.db,projectId:cfg.proj,storageBucket:cfg.storage,messagingSenderId:cfg.msg,appId:cfg.appId});
+db=firebase.database();use=1;console.log('✅ Firebase OK');
+}catch(e){console.error('❌ Firebase error:',e)}
 
-        <div class="scores-grid">
-            <div class="score-card" style="background-color: #8B4556;">
-                <h3>😱 JOKA</h3>
-                <div class="points"><span id="jokaTotal">0</span> poena</div>
-                <div class="wins"><span id="jokaWins">0</span> pobeda</div>
-            </div>
-            <div class="score-card" style="background-color: #3C4C24;">
-                <h3>🤯 PAJA</h3>
-                <div class="points"><span id="pajaTotal">0</span> poena</div>
-                <div class="wins"><span id="pajaWins">0</span> pobeda</div>
-            </div>
-        </div>
+function load(){
+if(use)db.ref('rechko2026').on('value',s=>{S=s.val()||{};ui()});
+else try{const x=localStorage.getItem('rechkoScores2026');if(x)S=JSON.parse(x);ui()}catch(e){}
+}
 
-        <div id="winnerBanner" style="display: none;"></div>
+function save(){
+if(use)db.ref('rechko2026').set(S);
+else try{localStorage.setItem('rechkoScores2026',JSON.stringify(S))}catch(e){}
+}
 
-        <div class="calendar-section">
-            <div class="calendar-title" id="calendarTitle">Januar - Dnevni Rezultati</div>
-            <div class="calendar" id="calendar"></div>
-            <div id="formSection" style="display: none;"></div>
-        </div>
-    </div>
+function ui(){cal();tot();mon();yr()}
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+function months(){
+document.getElementById('months').innerHTML=M.map((n,i)=>{
+const dt=S[i]||{},c=Object.keys(dt).length===D[i];
+let st='';
+if(c){
+let jt=0,pt=0;
+Object.values(dt).forEach(x=>{jt+=x.joka===999?0:(x.joka||0);pt+=x.paja===999?0:(x.paja||0)});
+const bg=jt<pt?cfg.jokaColor:pt<jt?cfg.pajaColor:'#6B7280';
+st=`style="background:${bg};color:white"`;
+}
+return`<button class="month-btn ${i===m?'active':''}"${st}onclick="sel(${i})">${n}</button>`;
+}).join('');
+}
 
-    <script>
-        // FIREBASE CONFIG
-        const firebaseConfig = {
-            apiKey: "AIzaSyATrCpqicc3HHCOpc6Pv-edqWlgpSiM-XU",
-            authDomain: "rechko-2026-f9959.firebaseapp.com",
-            databaseURL: "https://rechko-2026-f9959-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "rechko-2026-f9959",
-            storageBucket: "rechko-2026-f9959.firebasestorage.app",
-            messagingSenderId: "524255667916",
-            appId: "1:524255667916:web:2ba7a1961ef6dacaba0469"
-        };
+function sel(i){m=i;d=null;months();ui()}
 
-        let database = null;
-        let useFirebase = false;
+function cal(){
+const e=document.getElementById('cal');
+document.getElementById('title').textContent=`${M[m]} - Dnevni Rezultati`;
+let h='';
+for(let i=1;i<=D[m];i++){
+const ds=S[m]?.[i],s=d===i;
+let bg='',tx='#374151';
+if(ds&&!s){
+if(ds.winner==='Joka'){bg=`background-color:${cfg.jokaColor}`;tx='white'}
+else if(ds.winner==='Paja'){bg=`background-color:${cfg.pajaColor}`;tx='white'}
+else{bg='background-color:#6B7280';tx='white'}
+}
+h+=`<div class="day-cell ${s?'selected':''}"style="${bg}"onclick="pick(${i})">`;
+h+=`<div class="day-number"style="color:${tx}">${i}</div>`;
+if(ds){
+h+=`<div class="day-scores"style="color:${s?'#374151':tx}">`;
+h+=`<div style="color:${s?cfg.jokaColor:tx}">J: ${ds.joka===999?'❌':ds.joka}</div>`;
+h+=`<div style="color:${s?cfg.pajaColor:tx}">P: ${ds.paja===999?'❌':ds.paja}</div>`;
+h+=`</div><button class="delete-btn"style="color:${s?'#EF4444':tx}"onclick="del(${i},event)">✕</button>`;
+}
+h+='</div>';
+}
+e.innerHTML=h;
+d?show():hide();
+}
 
-        // Initialize Firebase
-        try {
-            firebase.initializeApp(firebaseConfig);
-            database = firebase.database();
-            useFirebase = true;
-            console.log('✅ Firebase connected successfully!');
-        } catch (error) {
-            console.error('❌ Firebase error:', error);
-            useFirebase = false;
-            document.querySelector('.info-box').innerHTML = `
-                <strong>⚠️ Firebase greška!</strong>
-                ${error.message}
-            `;
-            document.querySelector('.info-box').style.background = '#FEE2E2';
-            document.querySelector('.info-box').style.borderColor = '#EF4444';
-            document.querySelector('.info-box').style.color = '#991B1B';
-        }
+function pick(i){d=i;cal()}
 
-        const months = ['Januar', 'Februar', 'Mart', 'April', 'Maj', 'Jun', 'Jul', 'Avgust', 'Septembar', 'Oktobar', 'Novembar', 'Decembar'];
-        const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-        
-        let currentMonth = 0;
-        let selectedDay = null;
-        let scores = {};
+function show(){
+const ds=S[m]?.[d],js=ds?.joka||'',ps=ds?.paja||'';
+document.getElementById('form').style.display='block';
+document.getElementById('form').innerHTML=`
+<div class="form-section">
+<div class="form-title">${M[m]} - Dan ${d}</div>
+<div class="form-grid">
+<div class="form-group">
+<label>Joka - Broj pokušaja</label>
+<select id="ji"onchange="prev()"style="width:100%;padding:.75rem;border:2px solid #D1D5DB;border-radius:8px;font-size:1rem;background:white">
+<option value="">Izaberi...</option>
+${[1,2,3,4,5,6].map(n=>`<option value="${n}"${js==n?'selected':''}>${n} pokušaj${n>1?'a':''}</option>`).join('')}
+<option value="999"${js==999?'selected':''}>Nisam rešila</option>
+</select>
+</div>
+<div class="form-group">
+<label>Paja - Broj pokušaja</label>
+<select id="pi"onchange="prev()"style="width:100%;padding:.75rem;border:2px solid #D1D5DB;border-radius:8px;font-size:1rem;background:white">
+<option value="">Izaberi...</option>
+${[1,2,3,4,5,6].map(n=>`<option value="${n}"${ps==n?'selected':''}>${n} pokušaj${n>1?'a':''}</option>`).join('')}
+<option value="999"${ps==999?'selected':''}>Nisam rešio</option>
+</select>
+</div>
+</div>
+<div class="form-group"style="margin-bottom:1rem">
+<label>Pobednik (automatski - MANJE je BOLJE!)</label>
+<div class="winner-display"id="win">🤝 Nerešeno</div>
+</div>
+<div class="form-buttons">
+<button class="btn btn-primary"onclick="sav()">Sačuvaj</button>
+<button class="btn btn-secondary"onclick="can()">Otkaži</button>
+</div>
+</div>`;
+prev();
+}
 
-        // Timer za novu igru (svaki dan u 23:00)
-        function updateGameTimer() {
-            const now = new Date();
-            const nextGame = new Date();
-            nextGame.setHours(23, 0, 0, 0);
-            
-            // Ako je već prošlo 23h danas, postavi na sutra
-            if (now >= nextGame) {
-                nextGame.setDate(nextGame.getDate() + 1);
-            }
-            
-            const diff = nextGame - now;
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-            
-            const timerEl = document.getElementById('nextGameTimer');
-            if (timerEl) {
-                if (hours === 0 && minutes < 5) {
-                    timerEl.innerHTML = `⏰ Nova reč za <strong style="color: #EF4444;">${minutes}m ${seconds}s</strong> 🔥`;
-                } else {
-                    timerEl.innerHTML = `⏰ Nova reč za: <strong>${hours}h ${minutes}m</strong>`;
-                }
-            }
-        }
+function hide(){document.getElementById('form').style.display='none'}
 
-        // Load scores
-        function loadScores() {
-            if (useFirebase) {
-                database.ref('rechko2026').on('value', (snapshot) => {
-                    scores = snapshot.val() || {};
-                    updateUI();
-                });
-            } else {
-                try {
-                    const saved = localStorage.getItem('rechkoScores2026');
-                    if (saved) {
-                        scores = JSON.parse(saved);
-                    }
-                    updateUI();
-                } catch (error) {
-                    console.error('Error loading scores:', error);
-                }
-            }
-        }
+window.prev=function(){
+const j=parseInt(document.getElementById('ji').value)||0;
+const p=parseInt(document.getElementById('pi').value)||0;
+const e=document.getElementById('win');
+if(j===999&&p===999){e.textContent='🤝 Nerešeno (niko nije rešio)';e.style.background='#F9FAFB';e.style.color='#6B7280'}
+else if(j===999){e.textContent=`${cfg.pajaEmoji} Paja (Joka nije rešila!)`;e.style.background='#F0FDF4';e.style.color=cfg.pajaColor}
+else if(p===999){e.textContent=`${cfg.jokaEmoji} Joka (Paja nije rešio!)`;e.style.background='#FEE2E2';e.style.color=cfg.jokaColor}
+else if(j<p&&j>0){e.textContent=`${cfg.jokaEmoji} Joka (manje pokušaja!)`;e.style.background='#FEE2E2';e.style.color=cfg.jokaColor}
+else if(p<j&&p>0){e.textContent=`${cfg.pajaEmoji} Paja (manje pokušaja!)`;e.style.background='#F0FDF4';e.style.color=cfg.pajaColor}
+else if(j===p&&j>0){e.textContent='🤝 Nerešeno (isti broj)';e.style.background='#F9FAFB';e.style.color='#6B7280'}
+else{e.textContent='🤝 Nerešeno';e.style.background='#F9FAFB';e.style.color='#6B7280'}
+}
 
-        // Save scores
-        function saveScores() {
-            if (useFirebase) {
-                database.ref('rechko2026').set(scores);
-            } else {
-                try {
-                    localStorage.setItem('rechkoScores2026', JSON.stringify(scores));
-                } catch (error) {
-                    console.error('Error saving scores:', error);
-                }
-            }
-        }
+window.sav=function(){
+const j=parseInt(document.getElementById('ji').value)||0;
+const p=parseInt(document.getElementById('pi').value)||0;
+if(j===0||p===0){alert('⚠️ Molim te izaberi broj pokušaja za oba igrača!');return}
+let w='Nerešeno';
+if(j===999&&p!==999)w='Paja';
+else if(p===999&&j!==999)w='Joka';
+else if(j<p)w='Joka';
+else if(p<j)w='Paja';
+if(!S[m])S[m]={};
+S[m][d]={joka:j,paja:p,winner:w};
+save();d=null;
+const dt=S[m]||{},c=Object.keys(dt).length===D[m];
+if(c&&m<11)setTimeout(()=>{alert(`🎉 ${M[m]} je završen! Prelazimo na ${M[m+1]}!`);m++;months();ui()},500);
+else ui();
+}
 
-        // Update all UI
-        function updateUI() {
-            updateCalendar();
-            updateTotals();
-            updateWinnerBanner();
-            updateYearlyWinner();
-        }
+window.del=function(i,e){
+e.stopPropagation();
+if(S[m]){delete S[m][i];if(Object.keys(S[m]).length===0)delete S[m]}
+save();ui();
+}
 
-        // Initialize months
-        function initMonths() {
-            const monthsEl = document.getElementById('months');
-            monthsEl.innerHTML = months.map((month, idx) => {
-                const monthData = scores[idx] || {};
-                const daysPlayed = Object.keys(monthData).length;
-                const isMonthComplete = daysPlayed === daysInMonth[idx];
-                
-                let bgColor = '';
-                let textColor = '';
-                let borderStyle = '';
-                
-                if (isMonthComplete) {
-                    let jokaTotal = 0, pajaTotal = 0;
-                    
-                    Object.values(monthData).forEach(day => {
-                        const jokaScore = day.joka === 999 ? 0 : (day.joka || 0);
-                        const pajaScore = day.paja === 999 ? 0 : (day.paja || 0);
-                        
-                        jokaTotal += jokaScore;
-                        pajaTotal += pajaScore;
-                    });
-                    
-                    if (jokaTotal < pajaTotal) {
-                        bgColor = '#8B4556';
-                        textColor = 'white';
-                        borderStyle = '2px solid #6B3444';
-                    } else if (pajaTotal < jokaTotal) {
-                        bgColor = '#3C4C24';
-                        textColor = 'white';
-                        borderStyle = '2px solid #2C3C18';
-                    } else {
-                        bgColor = '#6B7280';
-                        textColor = 'white';
-                        borderStyle = '2px solid #4B5563';
-                    }
-                }
-                
-                const isActive = idx === currentMonth;
-                const styleAttr = isMonthComplete 
-                    ? `style="background: ${bgColor}; color: ${textColor}; border: ${borderStyle};"` 
-                    : '';
-                
-                return `<button class="month-btn ${isActive ? 'active' : ''}" ${styleAttr} onclick="selectMonth(${idx})">${month}</button>`;
-            }).join('');
-        }
+window.can=function(){d=null;cal()}
 
-        // Select month
-        function selectMonth(idx) {
-            currentMonth = idx;
-            selectedDay = null;
-            initMonths();
-            updateUI();
-        }
+window.reset=function(){
+if(confirm('⚠️ Da li si sigurna da želiš da obrišeš SVE podatke?\n\nOvo ne može da se vrati!')){
+S={};save();alert('✅ Svi podaci su obrisani!');
+}
+}
 
-        // Update calendar
-        function updateCalendar() {
-            try {
-                const calendarEl = document.getElementById('calendar');
-                const calendarTitle = document.getElementById('calendarTitle');
-                
-                if (!calendarEl || !calendarTitle) return;
-                
-                calendarTitle.textContent = `${months[currentMonth]} - Dnevni Rezultati`;
-                
-                const days = daysInMonth[currentMonth];
-                let html = '';
-                
-                for (let day = 1; day <= days; day++) {
-                    const dayScore = scores[currentMonth]?.[day];
-                    const hasScore = !!dayScore;
-                    const isSelected = selectedDay === day;
-                    
-                    let bgColor = '';
-                    let textColor = '#374151';
-                    
-                    if (hasScore && !isSelected) {
-                        if (dayScore.winner === 'Joka') {
-                            bgColor = 'background-color: #8B4556;';
-                            textColor = 'white';
-                        } else if (dayScore.winner === 'Paja') {
-                            bgColor = 'background-color: #3C4C24;';
-                            textColor = 'white';
-                        } else {
-                            bgColor = 'background-color: #6B7280;';
-                            textColor = 'white';
-                        }
-                    }
-                    
-                    html += `<div class="day-cell ${isSelected ? 'selected' : ''}" style="${bgColor}" onclick="selectDay(${day})">`;
-                    html += `<div class="day-number" style="color: ${textColor};">${day}</div>`;
-                    
-                    if (hasScore) {
-                        html += `<div class="day-scores" style="color: ${isSelected ? '#374151' : textColor};">`;
-                        html += `<div style="color: ${isSelected ? '#8B4556' : textColor};">J: ${dayScore.joka === 999 ? '❌' : dayScore.joka}</div>`;
-                        html += `<div style="color: ${isSelected ? '#3C4C24' : textColor};">P: ${dayScore.paja === 999 ? '❌' : dayScore.paja}</div>`;
-                        html += `</div>`;
-                        html += `<button class="delete-btn" style="color: ${isSelected ? '#EF4444' : textColor};" onclick="deleteScore(${day}, event)">✕</button>`;
-                    }
-                    
-                    html += '</div>';
-                }
-                
-                calendarEl.innerHTML = html;
-                
-                if (selectedDay) {
-                    showForm();
-                } else {
-                    hideForm();
-                }
-            } catch (error) {
-                console.error('Calendar update error:', error);
-            }
-        }
+function tot(){
+const dt=S[m]||{};
+let jt=0,pt=0,jw=0,pw=0;
+Object.values(dt).forEach(x=>{
+jt+=x.joka===999?0:(x.joka||0);
+pt+=x.paja===999?0:(x.paja||0);
+if(x.winner==='Joka')jw++;
+if(x.winner==='Paja')pw++;
+});
+document.getElementById('jt').textContent=jt;
+document.getElementById('pt').textContent=pt;
+document.getElementById('jw').textContent=jw;
+document.getElementById('pw').textContent=pw;
+}
 
-        // Select day
-        function selectDay(day) {
-            selectedDay = day;
-            updateCalendar();
-        }
+function mon(){
+const dt=S[m]||{},c=Object.keys(dt).length===D[m];
+const e=document.getElementById('monthly');
+if(!c){e.style.display='none';return}
+let jt=0,pt=0;
+Object.values(dt).forEach(x=>{jt+=x.joka===999?0:(x.joka||0);pt+=x.paja===999?0:(x.paja||0)});
+let g,t,f;
+if(jt<pt){g=`linear-gradient(to right,${cfg.jokaColor},#6B3444)`;t='🏆 POBEDNIK MESECA: JOKA 🏆';f=`Manje pokušaja: ${pt-jt} razlika`}
+else if(pt<jt){g=`linear-gradient(to right,${cfg.pajaColor},#2C3C18)`;t='🏆 POBEDNIK MESECA: PAJA 🏆';f=`Manje pokušaja: ${jt-pt} razlika`}
+else{g='linear-gradient(to right,#6B7280,#4B5563)';t='🤝 MESEC JE NEREŠEN 🤝';f=`Oba igrača: ${jt} pokušaja`}
+e.className='winner-banner';e.style.background=g;e.style.display='block';
+e.innerHTML=`<h3>${t}</h3><p style="font-size:1.1rem">${f}</p>`;
+}
 
-        // Show form
-        function showForm() {
-            const formSection = document.getElementById('formSection');
-            const dayScore = scores[currentMonth]?.[selectedDay];
-            
-            const jokaScore = dayScore?.joka || '';
-            const pajaScore = dayScore?.paja || '';
-            
-            formSection.style.display = 'block';
-            formSection.innerHTML = `
-                <div class="form-section">
-                    <div class="form-title">${months[currentMonth]} - Dan ${selectedDay}</div>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Joka - Broj pokušaja</label>
-                            <select id="jokaInput" 
-                                   onfocus="this.style.borderColor='#8B4556'" 
-                                   onblur="this.style.borderColor='#D1D5DB'"
-                                   onchange="updateWinnerPreview()"
-                                   style="width: 100%; padding: 0.75rem; border: 2px solid #D1D5DB; border-radius: 8px; font-size: 1rem; text-align: center; background: white;">
-                                <option value="">Izaberi...</option>
-                                <option value="1" ${jokaScore == 1 ? 'selected' : ''}>1 pokušaj</option>
-                                <option value="2" ${jokaScore == 2 ? 'selected' : ''}>2 pokušaja</option>
-                                <option value="3" ${jokaScore == 3 ? 'selected' : ''}>3 pokušaja</option>
-                                <option value="4" ${jokaScore == 4 ? 'selected' : ''}>4 pokušaja</option>
-                                <option value="5" ${jokaScore == 5 ? 'selected' : ''}>5 pokušaja</option>
-                                <option value="6" ${jokaScore == 6 ? 'selected' : ''}>6 pokušaja</option>
-                                <option value="999" ${jokaScore == 999 ? 'selected' : ''}>Nisam rešila</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Paja - Broj pokušaja</label>
-                            <select id="pajaInput"
-                                   onfocus="this.style.borderColor='#3C4C24'" 
-                                   onblur="this.style.borderColor='#D1D5DB'"
-                                   onchange="updateWinnerPreview()"
-                                   style="width: 100%; padding: 0.75rem; border: 2px solid #D1D5DB; border-radius: 8px; font-size: 1rem; text-align: center; background: white;">
-                                <option value="">Izaberi...</option>
-                                <option value="1" ${pajaScore == 1 ? 'selected' : ''}>1 pokušaj</option>
-                                <option value="2" ${pajaScore == 2 ? 'selected' : ''}>2 pokušaja</option>
-                                <option value="3" ${pajaScore == 3 ? 'selected' : ''}>3 pokušaja</option>
-                                <option value="4" ${pajaScore == 4 ? 'selected' : ''}>4 pokušaja</option>
-                                <option value="5" ${pajaScore == 5 ? 'selected' : ''}>5 pokušaja</option>
-                                <option value="6" ${pajaScore == 6 ? 'selected' : ''}>6 pokušaja</option>
-                                <option value="999" ${pajaScore == 999 ? 'selected' : ''}>Nisam rešio</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group" style="margin-bottom: 1rem;">
-                        <label>Pobednik (automatski - MANJE je BOLJE!)</label>
-                        <div class="winner-display" id="winnerPreview">🤝 Nerešeno</div>
-                    </div>
-                    <div class="form-buttons">
-                        <button class="btn btn-primary" onclick="saveScore()">Sačuvaj</button>
-                        <button class="btn btn-secondary" onclick="cancelForm()">Otkaži</button>
-                    </div>
-                </div>
-            `;
-            updateWinnerPreview();
-        }
+function yr(){
+const e=document.getElementById('yearly');
+let jw=0,pw=0,cm=0;
+for(let i=0;i<12;i++){
+const dt=S[i]||{};
+if(Object.keys(dt).length===D[i]){
+cm++;
+let jt=0,pt=0;
+Object.values(dt).forEach(x=>{jt+=x.joka===999?0:(x.joka||0);pt+=x.paja===999?0:(x.paja||0)});
+if(jt<pt)jw++;else if(pt<jt)pw++;
+}
+}
+if(cm===0){e.style.display='none';return}
+let g,t,s;
+if(jw>pw){g=`linear-gradient(to right,${cfg.jokaColor},#6B3444)`;t=cm===12?'🎊 POBEDNIK GODINE 2026: JOKA 🎊':'👑 JOKA VODI U GODINI 👑';s=`${jw} meseci pobeda (Paja: ${pw})`}
+else if(pw>jw){g=`linear-gradient(to right,${cfg.pajaColor},#2C3C18)`;t=cm===12?'🎊 POBEDNIK GODINE 2026: PAJA 🎊':'👑 PAJA VODI U GODINI 👑';s=`${pw} meseci pobeda (Joka: ${jw})`}
+else{g='linear-gradient(to right,#6B7280,#4B5563)';t=cm===12?'🎊 GODINA 2026 JE NEREŠENA 🎊':'⚖️ GODINA JE IZJEDNAČENA ⚖️';s=`Oba po ${jw} meseci pobeda`}
+e.className='winner-banner';e.style.background=g;e.style.display='block';e.style.marginBottom='1.5rem';
+e.innerHTML=`<h3>${t}</h3><p style="font-size:1.1rem">${s}</p><p style="font-size:.9rem;margin-top:.5rem;opacity:.9">Završeno meseci: ${cm}/12</p>`;
+}
 
-        // Hide form
-        function hideForm() {
-            document.getElementById('formSection').style.display = 'none';
-        }
+function tmr(){
+const n=new Date(),x=new Date();
+x.setHours(23,0,0,0);
+if(n>=x)x.setDate(x.getDate()+1);
+const df=x-n,h=Math.floor(df/3600000),mn=Math.floor((df%3600000)/60000),s=Math.floor((df%60000)/1000);
+const e=document.getElementById('timer');
+if(e)e.innerHTML=h===0&&mn<5?`⏰ Nova reč za <strong style="color:#EF4444">${mn}m ${s}s</strong> 🔥`:`⏰ Nova reč za: <strong>${h}h ${mn}m</strong>`;
+}
 
-        // Update winner preview
-        window.updateWinnerPreview = function() {
-            const jokaInput = document.getElementById('jokaInput');
-            const pajaInput = document.getElementById('pajaInput');
-            const winnerPreview = document.getElementById('winnerPreview');
-            
-            if (!jokaInput || !pajaInput || !winnerPreview) return;
-            
-            const joka = parseInt(jokaInput.value) || 0;
-            const paja = parseInt(pajaInput.value) || 0;
-            
-            if (joka === 999 && paja === 999) {
-                winnerPreview.textContent = '🤝 Nerešeno (niko nije rešio)';
-                winnerPreview.style.background = '#F9FAFB';
-                winnerPreview.style.color = '#6B7280';
-            } else if (joka === 999) {
-                winnerPreview.textContent = '🤯 Paja (Joka nije rešila!)';
-                winnerPreview.style.background = '#F0FDF4';
-                winnerPreview.style.color = '#3C4C24';
-            } else if (paja === 999) {
-                winnerPreview.textContent = '😱 Joka (Paja nije rešio!)';
-                winnerPreview.style.background = '#FEE2E2';
-                winnerPreview.style.color = '#8B4556';
-            } else if (joka < paja && joka > 0) {
-                winnerPreview.textContent = '😱 Joka (manje pokušaja!)';
-                winnerPreview.style.background = '#FEE2E2';
-                winnerPreview.style.color = '#8B4556';
-            } else if (paja < joka && paja > 0) {
-                winnerPreview.textContent = '🤯 Paja (manje pokušaja!)';
-                winnerPreview.style.background = '#F0FDF4';
-                winnerPreview.style.color = '#3C4C24';
-            } else if (joka === paja && joka > 0) {
-                winnerPreview.textContent = '🤝 Nerešeno (isti broj)';
-                winnerPreview.style.background = '#F9FAFB';
-                winnerPreview.style.color = '#6B7280';
-            } else {
-                winnerPreview.textContent = '🤝 Nerešeno';
-                winnerPreview.style.background = '#F9FAFB';
-                winnerPreview.style.color = '#6B7280';
-            }
-        }
-
-        // Save score
-        window.saveScore = function() {
-            const jokaInput = document.getElementById('jokaInput');
-            const pajaInput = document.getElementById('pajaInput');
-            
-            if (!jokaInput || !pajaInput) return;
-            
-            const joka = parseInt(jokaInput.value) || 0;
-            const paja = parseInt(pajaInput.value) || 0;
+load();months();tmr();setInterval(tmr,1000);
+</script>
+</body>
+</html>
