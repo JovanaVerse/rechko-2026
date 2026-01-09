@@ -366,7 +366,9 @@
         <div class="header">
             <div class="header-top">
                 <div class="title">🏆 RECHKO 2026</div>
-                <div style="font-size: 1.5rem;">📅</div>
+                <button onclick="resetAllData()" style="padding: 0.5rem 1rem; background: #EF4444; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem;">
+                    🗑️ Reset Sve
+                </button>
             </div>
             <div class="months" id="months"></div>
         </div>
@@ -691,6 +693,16 @@
             updateCalendar();
         }
 
+        // Reset all data
+        window.resetAllData = function() {
+            if (confirm('⚠️ Da li si sigurna da želiš da obrišeš SVE podatke za celu godinu?\n\nOvo ne može da se vrati!')) {
+                scores = {};
+                saveScores();
+                console.log('🗑️ Svi podaci obrisani!');
+                alert('✅ Svi podaci su obrisani!');
+            }
+        }
+
         // Update totals
         function updateTotals() {
             try {
@@ -837,23 +849,8 @@
         loadScores();
         initMonths();
         
-        // AUTO-POPULATE Januar nakon 1.5 sekunde (za testiranje)
-        setTimeout(() => {
-            if (!scores[0] || Object.keys(scores[0]).length === 0) {
-                scores[0] = {};
-                for (let day = 1; day <= 31; day++) {
-                    const jokaScore = Math.floor(Math.random() * 3) + 3; // 3-5
-                    const pajaScore = jokaScore + Math.floor(Math.random() * 3) + 1; // 4-7
-                    scores[0][day] = {
-                        joka: jokaScore,
-                        paja: pajaScore,
-                        winner: 'Joka' // Joka ima manje = pobedila
-                    };
-                }
-                saveScores();
-                console.log('✅ Januar automatski popunjen testnim podacima! Joka: ~120 poena, Paja: ~180 poena');
-            }
-        }, 1500);
+        // NE UČITAVAJ testne podatke automatski!
+        // Korisnik može ručno da unosi podatke
     </script>
 </body>
 </html>
