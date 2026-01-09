@@ -516,7 +516,13 @@ save();ui();
 
 window.reset=function(){
 if(confirm('⚠️ Da li si sigurna da želiš da obrišeš SVE podatke?\n\nOvo ne može da se vrati!')){
-S={};save();alert('✅ Svi podaci su obrisani!');
+S={};
+todayStatus={joka:'waiting',paja:'waiting',date:getTodayKey()};
+save();
+saveStatus();
+alert('✅ Svi podaci i statusi su obrisani!');
+ui();
+updateStatus();
 }
 }
 
