@@ -617,17 +617,37 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Joka - Broj pokušaja</label>
-                            <input type="number" id="jokaInput" value="${jokaScore}" placeholder="0" 
+                            <select id="jokaInput" 
                                    onfocus="this.style.borderColor='#8B4556'" 
                                    onblur="this.style.borderColor='#D1D5DB'"
-                                   oninput="updateWinnerPreview()">
+                                   onchange="updateWinnerPreview()"
+                                   style="width: 100%; padding: 0.75rem; border: 2px solid #D1D5DB; border-radius: 8px; font-size: 1rem; text-align: center; background: white;">
+                                <option value="">Izaberi...</option>
+                                <option value="1" ${jokaScore == 1 ? 'selected' : ''}>1 pokušaj</option>
+                                <option value="2" ${jokaScore == 2 ? 'selected' : ''}>2 pokušaja</option>
+                                <option value="3" ${jokaScore == 3 ? 'selected' : ''}>3 pokušaja</option>
+                                <option value="4" ${jokaScore == 4 ? 'selected' : ''}>4 pokušaja</option>
+                                <option value="5" ${jokaScore == 5 ? 'selected' : ''}>5 pokušaja</option>
+                                <option value="6" ${jokaScore == 6 ? 'selected' : ''}>6 pokušaja</option>
+                                <option value="999" ${jokaScore == 999 ? 'selected' : ''}>Nisam rešila</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label>Paja - Broj pokušaja</label>
-                            <input type="number" id="pajaInput" value="${pajaScore}" placeholder="0"
+                            <select id="pajaInput"
                                    onfocus="this.style.borderColor='#3C4C24'" 
                                    onblur="this.style.borderColor='#D1D5DB'"
-                                   oninput="updateWinnerPreview()">
+                                   onchange="updateWinnerPreview()"
+                                   style="width: 100%; padding: 0.75rem; border: 2px solid #D1D5DB; border-radius: 8px; font-size: 1rem; text-align: center; background: white;">
+                                <option value="">Izaberi...</option>
+                                <option value="1" ${pajaScore == 1 ? 'selected' : ''}>1 pokušaj</option>
+                                <option value="2" ${pajaScore == 2 ? 'selected' : ''}>2 pokušaja</option>
+                                <option value="3" ${pajaScore == 3 ? 'selected' : ''}>3 pokušaja</option>
+                                <option value="4" ${pajaScore == 4 ? 'selected' : ''}>4 pokušaja</option>
+                                <option value="5" ${pajaScore == 5 ? 'selected' : ''}>5 pokušaja</option>
+                                <option value="6" ${pajaScore == 6 ? 'selected' : ''}>6 pokušaja</option>
+                                <option value="999" ${pajaScore == 999 ? 'selected' : ''}>Nisam rešio</option>
+                            </select>
                         </div>
                     </div>
                     <div class="form-group" style="margin-bottom: 1rem;">
@@ -659,8 +679,21 @@
             const joka = parseInt(jokaInput.value) || 0;
             const paja = parseInt(pajaInput.value) || 0;
             
-            // OBRNUTA LOGIKA: Manje pokušaja = pobeda
-            if (joka < paja && joka > 0) {
+            // Ako neko nije rešio (999), automatski gubi
+            if (joka === 999 && paja === 999) {
+                winnerPreview.textContent = '🤝 Nerešeno (obe nisu rešile)';
+                winnerPreview.style.background = '#F9FAFB';
+                winnerPreview.style.color = '#6B7280';
+            } else if (joka === 999) {
+                winnerPreview.textContent = '🤯 Paja (Joka nije rešila!)';
+                winnerPreview.style.background = '#F0FDF4';
+                winnerPreview.style.color = '#3C4C24';
+            } else if (paja === 999) {
+                winnerPreview.textContent = '😱 Joka (Paja nije rešio!)';
+                winnerPreview.style.background = '#FEE2E2';
+                winnerPreview.style.color = '#8B4556';
+            } else if (joka < paja && joka > 0) {
+                // OBRNUTA LOGIKA: Manje pokušaja = pobeda
                 winnerPreview.textContent = '😱 Joka (manje pokušaja!)';
                 winnerPreview.style.background = '#FEE2E2';
                 winnerPreview.style.color = '#8B4556';
@@ -689,10 +722,26 @@
             const joka = parseInt(jokaInput.value) || 0;
             const paja = parseInt(pajaInput.value) || 0;
             
+            // Validacija - mora da se izabere nešto
+            if (joka === 0 || paja === 0) {
+                alert('⚠️ Molim te izaberi broj pokušaja za oba igrača!');
+                return;
+            }
+            
             // OBRNUTA LOGIKA: Manje pokušaja = pobeda
+            // 999 = "Nisam rešio/la" - automatski gubi
             let winner = 'Nerešeno';
-            if (joka < paja && joka > 0) winner = 'Joka';
-            else if (paja < joka && paja > 0) winner = 'Paja';
+            if (joka === 999 && paja === 999) {
+                winner = 'Nerešeno';
+            } else if (joka === 999) {
+                winner = 'Paja'; // Joka nije rešila, Paja pobedio
+            } else if (paja === 999) {
+                winner = 'Joka'; // Paja nije rešio, Joka pobedila
+            } else if (joka < paja) {
+                winner = 'Joka';
+            } else if (paja < joka) {
+                winner = 'Paja';
+            }
             
             if (!scores[currentMonth]) {
                 scores[currentMonth] = {};
