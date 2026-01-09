@@ -160,7 +160,7 @@ pajaEmoji:"🤯"
 
 const M=['Januar','Februar','Mart','April','Maj','Jun','Jul','Avgust','Septembar','Oktobar','Novembar','Decembar'];
 const D=[31,28,31,30,31,30,31,31,30,31,30,31];
-let db,use=0,m=0,d=null,S={},todayStatus={joka:'waiting',paja:'waiting'};
+let db,use=0,m=new Date().getMonth(),d=null,S={},todayStatus={joka:'waiting',paja:'waiting'};
 
 try{
 firebase.initializeApp({apiKey:cfg.api,authDomain:cfg.domain,databaseURL:cfg.db,projectId:cfg.proj,storageBucket:cfg.storage,messagingSenderId:cfg.msg,appId:cfg.appId});
