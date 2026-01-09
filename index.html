@@ -485,9 +485,46 @@
         // Initialize months
         function initMonths() {
             const monthsEl = document.getElementById('months');
-            monthsEl.innerHTML = months.map((month, idx) => 
-                `<button class="month-btn ${idx === currentMonth ? 'active' : ''}" onclick="selectMonth(${idx})">${month}</button>`
-            ).join('');
+            monthsEl.innerHTML = months.map((month, idx) => {
+                const monthData = scores[idx] || {};
+                const daysPlayed = Object.keys(monthData).length;
+                const isMonthComplete = daysPlayed === daysInMonth[idx];
+                
+                let bgColor = '';
+                let textColor = '';
+                let borderStyle = '';
+                
+                if (isMonthComplete) {
+                    // Izračunaj pobednika meseca
+                    let jokaTotal = 0, pajaTotal = 0;
+                    Object.values(monthData).forEach(day => {
+                        jokaTotal += day.joka || 0;
+                        pajaTotal += day.paja || 0;
+                    });
+                    
+                    // Oboj u boju pobednika (OBRNUTA LOGIKA: manje = pobeda)
+                    if (jokaTotal < pajaTotal) {
+                        bgColor = '#8B4556'; // Joka boja
+                        textColor = 'white';
+                        borderStyle = '2px solid #6B3444';
+                    } else if (pajaTotal < jokaTotal) {
+                        bgColor = '#3C4C24'; // Paja boja
+                        textColor = 'white';
+                        borderStyle = '2px solid #2C3C18';
+                    } else {
+                        bgColor = '#6B7280'; // Nerešeno
+                        textColor = 'white';
+                        borderStyle = '2px solid #4B5563';
+                    }
+                }
+                
+                const isActive = idx === currentMonth;
+                const styleAttr = isMonthComplete 
+                    ? `style="background: ${bgColor}; color: ${textColor}; border: ${borderStyle};"` 
+                    : '';
+                
+                return `<button class="month-btn ${isActive ? 'active' : ''}" ${styleAttr} onclick="selectMonth(${idx})">${month}</button>`;
+            }).join('');
         }
 
         // Select month
@@ -665,8 +702,24 @@
             saveScores();
             
             selectedDay = null;
-            // UVEK ažuriraj UI odmah, bez obzira na Firebase
-            updateUI();
+            
+            // Proveri da li je mesec završen
+            const monthData = scores[currentMonth] || {};
+            const daysPlayed = Object.keys(monthData).length;
+            const isMonthComplete = daysPlayed === daysInMonth[currentMonth];
+            
+            if (isMonthComplete && currentMonth < 11) {
+                // Mesec je završen, pređi na sledeći
+                setTimeout(() => {
+                    alert(`🎉 ${months[currentMonth]} je završen! Prelazimo na ${months[currentMonth + 1]}!`);
+                    currentMonth = currentMonth + 1;
+                    initMonths();
+                    updateUI();
+                }, 500);
+            } else {
+                // UVEK ažuriraj UI odmah
+                updateUI();
+            }
         }
 
         // Delete score
