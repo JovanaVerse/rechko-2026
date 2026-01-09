@@ -665,9 +665,8 @@
             saveScores();
             
             selectedDay = null;
-            if (!useFirebase) {
-                updateUI();
-            }
+            // UVEK ažuriraj UI odmah, bez obzira na Firebase
+            updateUI();
         }
 
         // Delete score
@@ -682,9 +681,8 @@
             }
             saveScores();
             
-            if (!useFirebase) {
-                updateUI();
-            }
+            // UVEK ažuriraj UI odmah, bez obzira na Firebase
+            updateUI();
         }
 
         // Cancel form
