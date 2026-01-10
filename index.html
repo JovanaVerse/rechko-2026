@@ -551,14 +551,15 @@ if(!S[m])S[m]={};
 S[m][d]={joka:j,paja:p,winner:w};
 save();
 
-// Reset status za sledeći dan
+// Reset status za sledeći dan - ali tek posle prikaza pobednika
 const today=new Date();
 if(today.getDate()===d&&today.getMonth()===m){
-todayStatus={joka:'waiting',paja:'waiting',date:getTodayKey()};
-saveStatus();
+// Ne resetuj odmah, samo zatvori modal i prikaži winner screen
+closeModal();
+updateStatus(); // Ovo će prikazati winner screen
+}else{
+closeModal();
 }
-
-closeModal(); // Zatvori modal umesto d=null
 
 const dt=S[m]||{},c=Object.keys(dt).length===D[m];
 if(c&&m<11)setTimeout(()=>{alert(`🎉 ${M[m]} je završen! Prelazimo na ${M[m+1]}!`);m++;months();ui()},500);
