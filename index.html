@@ -221,11 +221,14 @@ function load(){
 if(use){
 db.ref('rechko2026').on('value',s=>{S=s.val()||{};ui()});
 db.ref('todayStatus').on('value',s=>{
+console.log('📡 Firebase update primljen:', s.val());
 const data=s.val();
 if(data&&data.date===getTodayKey()){
 todayStatus=data;
+console.log('✅ Status ažuriran:', todayStatus);
 }else{
 todayStatus={joka:'waiting',paja:'waiting',date:getTodayKey()};
+console.log('🔄 Novi status kreiran:', todayStatus);
 }
 updateStatus();
 });
@@ -248,8 +251,14 @@ else try{localStorage.setItem('rechkoScores2026',JSON.stringify(S))}catch(e){}
 
 function saveStatus(){
 todayStatus.date=getTodayKey();
-if(use)db.ref('todayStatus').set(todayStatus);
-else try{localStorage.setItem('rechkoTodayStatus',JSON.stringify(todayStatus))}catch(e){}
+console.log('💾 Čuvanje statusa:', todayStatus);
+if(use){
+db.ref('todayStatus').set(todayStatus).then(()=>{
+console.log('✅ Status sačuvan u Firebase');
+}).catch(err=>{
+console.error('❌ Greška pri čuvanju:', err);
+});
+}else try{localStorage.setItem('rechkoTodayStatus',JSON.stringify(todayStatus))}catch(e){}
 }
 
 function getTodayKey(){
