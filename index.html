@@ -223,12 +223,19 @@ db.ref('rechko2026').on('value',s=>{S=s.val()||{};ui()});
 db.ref('todayStatus').on('value',s=>{
 console.log('📡 Firebase update primljen:', s.val());
 const data=s.val();
+// Ako postoji status u bazi i datum se poklapa, koristi ga
 if(data&&data.date===getTodayKey()){
 todayStatus=data;
-console.log('✅ Status ažuriran:', todayStatus);
-}else{
-todayStatus={joka:'waiting',paja:'waiting',date:getTodayKey()};
-console.log('🔄 Novi status kreiran:', todayStatus);
+console.log('✅ Status učitan iz Firebase:', todayStatus);
+}else if(!data||data.date!==getTodayKey()){
+// Samo ako nema statusa u bazi ili je datum prošao, napravi novi
+const newStatus={joka:'waiting',paja:'waiting',date:getTodayKey()};
+todayStatus=newStatus;
+// Sačuvaj novi status samo ako je datum prošao
+if(!data||data.date!==getTodayKey()){
+db.ref('todayStatus').set(newStatus);
+console.log('🔄 Novi status kreiran za novi dan:', newStatus);
+}
 }
 updateStatus();
 });
@@ -239,6 +246,10 @@ const st=localStorage.getItem('rechkoTodayStatus');
 if(st){
 const data=JSON.parse(st);
 if(data.date===getTodayKey())todayStatus=data;
+else{
+todayStatus={joka:'waiting',paja:'waiting',date:getTodayKey()};
+localStorage.setItem('rechkoTodayStatus',JSON.stringify(todayStatus));
+}
 }
 ui();updateStatus();
 }catch(e){}
@@ -623,6 +634,7 @@ S={};
 todayStatus={joka:'waiting',paja:'waiting',date:getTodayKey()};
 save();
 saveStatus();
+console.log('🗑️ Sve resetovano!');
 alert('✅ Svi podaci i statusi su obrisani!');
 ui();
 updateStatus();
@@ -695,6 +707,8 @@ const now=new Date();
 // Proveri da li je promenjen dan (posle 23h)
 const currentKey=getTodayKey();
 if(todayStatus.date!==currentKey){
+console.log('⏰ Novi dan detektovan! Resetujem status...');
+console.log('Stari datum:', todayStatus.date, 'Novi datum:', currentKey);
 todayStatus={joka:'waiting',paja:'waiting',date:currentKey};
 saveStatus();
 updateStatus();
