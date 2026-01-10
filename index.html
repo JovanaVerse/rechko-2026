@@ -4,6 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RECHKO 2026</title>
+
+<!-- PWA Meta Tags -->
+<meta name="description" content="Praćenje Rechko rezultata između Joke i Paje">
+<meta name="theme-color" content="#2563EB">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="RECHKO 2026">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,sans-serif;background:linear-gradient(135deg,#EEF2FF,#C7D2FE);min-height:100vh;padding:.75rem;overflow-x:hidden}
@@ -729,6 +739,15 @@ ui(); // Osveži UI da prikaže novi dan u kalendaru
 load();months();tmr();
 setInterval(tmr,1000);
 setInterval(checkNewWord,10000); // Provera svakih 10 sekundi za novu reč
+
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(registration => console.log('✅ Service Worker registrovan'))
+      .catch(err => console.log('❌ Service Worker greška:', err));
+  });
+}
 </script>
 </body>
 </html>
