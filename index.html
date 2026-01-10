@@ -611,22 +611,25 @@ else if(j<p)w='Joka';
 else if(p<j)w='Paja';
 if(!S[m])S[m]={};
 S[m][d]={joka:j,paja:p,winner:w};
+
+console.log('💾 Čuvanje rezultata:', S[m][d]);
+
+// Sačuvaj prvo
 save();
 
 // Zatvori modal
 closeModal();
 
-// Uvek osveži UI i prikaži winner screen (ako je današnji dan)
-const today=new Date();
-if(today.getDate()===d&&today.getMonth()===m){
-// Za današnji dan, pozovi updateStatus da prikaže winner screen
-updateStatus();
-}
+// Čekaj kratko da Firebase sinhronizuje, onda osveži UI
+setTimeout(()=>{
+console.log('🔄 Osvežavanje UI nakon čuvanja...');
+ui(); // Osveži ceo UI
+updateStatus(); // Prikaži winner screen ako je današnji dan
+}, 300);
 
 // Proveri da li je mesec završen
-ui();
 const dt=S[m]||{},c=Object.keys(dt).length===D[m];
-if(c&&m<11)setTimeout(()=>{alert(`🎉 ${M[m]} je završen! Prelazimo na ${M[m+1]}!`);m++;months();ui()},500);
+if(c&&m<11)setTimeout(()=>{alert(`🎉 ${M[m]} je završen! Prelazimo na ${M[m+1]}!`);m++;months();ui()},800);
 }
 
 window.del=function(i,e){
