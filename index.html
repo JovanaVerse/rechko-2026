@@ -613,19 +613,20 @@ if(!S[m])S[m]={};
 S[m][d]={joka:j,paja:p,winner:w};
 save();
 
-// Reset status za sledeći dan - ali tek posle prikaza pobednika
+// Zatvori modal
+closeModal();
+
+// Uvek osveži UI i prikaži winner screen (ako je današnji dan)
 const today=new Date();
 if(today.getDate()===d&&today.getMonth()===m){
-// Ne resetuj odmah, samo zatvori modal i prikaži winner screen
-closeModal();
-updateStatus(); // Ovo će prikazati winner screen
-}else{
-closeModal();
+// Za današnji dan, pozovi updateStatus da prikaže winner screen
+updateStatus();
 }
 
+// Proveri da li je mesec završen
+ui();
 const dt=S[m]||{},c=Object.keys(dt).length===D[m];
 if(c&&m<11)setTimeout(()=>{alert(`🎉 ${M[m]} je završen! Prelazimo na ${M[m+1]}!`);m++;months();ui()},500);
-else ui();
 }
 
 window.del=function(i,e){
