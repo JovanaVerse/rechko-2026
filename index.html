@@ -131,14 +131,14 @@ body{font-family:-apple-system,sans-serif;background:linear-gradient(135deg,#EEF
 </head>
 <body>
 <div class="container">
-<div class="info-box">
-<strong style="display:block;margin-bottom:.5rem">✅ Firebase POVEZAN!</strong>
-Aplikacija koristi online bazu podataka. Svi koji otvore ovaj fajl dele iste podatke u realnom vremenu! 🚀<br><br>
-<strong style="display:block;margin-bottom:.5rem">📝 VAŽNO:</strong>MANJE pokušaja = bolje! Ko ima MANJE poena, taj POBEDI. 🏆
-<div class="game-link-box">
-<strong style="color:#065F46;display:block;margin-bottom:.5rem">🎮 IGRAJ RECHKO:</strong>
-<a href="https://rechko.com/" target="_blank">👉 rechko.com</a>
-<div style="margin-top:.5rem;font-size:.9rem;color:#065F46" id="timer">⏰ Učitavanje...</div>
+
+<div class="header">
+<div class="header-top">
+<div class="title">🏆 RECHKO 2026</div>
+<div style="display:flex;flex-direction:column;align-items:flex-end;gap:.5rem">
+<a href="https://rechko.com/" target="_blank" style="font-size:.9rem;color:#2563EB;font-weight:600;text-decoration:none">🎮 Igraj Rechko →</a>
+<div style="font-size:.9rem;color:#065F46;font-weight:600" id="timer">⏰ Učitavanje...</div>
+</div>
 </div>
 </div>
 
@@ -342,7 +342,7 @@ statusContent.innerHTML=`
 ${winnerDetails}
 </div>
 <div style="margin-top:1.5rem;font-size:1rem;opacity:.8">
-⏰ Čeka se nova Rechko reč sutra u 23h...
+⏰ Čeka se nova Rechko reč u 23h...
 </div>
 </div>`;
 readyBanner.style.display='none';
