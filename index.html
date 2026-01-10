@@ -428,7 +428,9 @@ readyBanner.style.display='none';
 }
 
 window.markSolved=function(player){
+console.log(`🟢 markSolved pozvan za: ${player}`);
 todayStatus[player]='solved';
+console.log('📝 Lokalni status:', todayStatus);
 saveStatus();
 updateStatus();
 
@@ -451,13 +453,17 @@ setTimeout(()=>openModal(),300);
 }
 
 window.markWaiting=function(player){
+console.log(`🟡 markWaiting pozvan za: ${player}`);
 todayStatus[player]='waiting';
+console.log('📝 Lokalni status:', todayStatus);
 saveStatus();
 updateStatus();
 }
 
 window.markFailed=function(player){
+console.log(`🔴 markFailed pozvan za: ${player}`);
 todayStatus[player]='failed';
+console.log('📝 Lokalni status:', todayStatus);
 saveStatus();
 updateStatus();
 
