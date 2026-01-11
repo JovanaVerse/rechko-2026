@@ -665,9 +665,9 @@ function tot(){
 const dt=S[m]||{};
 let jt=0,pt=0,jw=0,pw=0;
 Object.values(dt).forEach(x=>{
-// 999 = nije rešio/rešila, što se računa kao 0 poena (ne dodaje se u ukupan zbir)
-jt+=x.joka===999?0:(x.joka||0);
-pt+=x.paja===999?0:(x.paja||0);
+// 999 = nije rešio/rešila, što se računa kao 7 poena
+jt+=x.joka===999?7:(x.joka||0);
+pt+=x.paja===999?7:(x.paja||0);
 if(x.winner==='Joka')jw++;
 if(x.winner==='Paja')pw++;
 });
@@ -682,7 +682,7 @@ const dt=S[m]||{},c=Object.keys(dt).length===D[m];
 const e=document.getElementById('monthly');
 if(!c){e.style.display='none';return}
 let jt=0,pt=0;
-Object.values(dt).forEach(x=>{jt+=x.joka===999?0:(x.joka||0);pt+=x.paja===999?0:(x.paja||0)});
+Object.values(dt).forEach(x=>{jt+=x.joka===999?7:(x.joka||0);pt+=x.paja===999?7:(x.paja||0)});
 let g,t,f;
 if(jt<pt){g=`linear-gradient(to right,${cfg.jokaColor},#6B3444)`;t='🏆 POBEDNIK MESECA: JOKA 🏆';f=`Manje pokušaja: ${pt-jt} razlika`}
 else if(pt<jt){g=`linear-gradient(to right,${cfg.pajaColor},#2C3C18)`;t='🏆 POBEDNIK MESECA: PAJA 🏆';f=`Manje pokušaja: ${jt-pt} razlika`}
@@ -699,7 +699,7 @@ const dt=S[i]||{};
 if(Object.keys(dt).length===D[i]){
 cm++;
 let jt=0,pt=0;
-Object.values(dt).forEach(x=>{jt+=x.joka===999?0:(x.joka||0);pt+=x.paja===999?0:(x.paja||0)});
+Object.values(dt).forEach(x=>{jt+=x.joka===999?7:(x.joka||0);pt+=x.paja===999?7:(x.paja||0)});
 if(jt<pt)jw++;else if(pt<jt)pw++;
 }
 }
